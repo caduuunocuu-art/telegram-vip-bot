@@ -1,4 +1,4 @@
 aiogram==2.25.2
-aiohttp==3.9.5
+aiohttp==3.8.6
 APScheduler==3.10.4
 aiosqlite==0.20.0
