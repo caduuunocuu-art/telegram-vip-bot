@@ -113,58 +113,60 @@ _db_lock = asyncio.Lock()
 # (baseado no CODE B, adaptado)
 # -------------------------
 MESSAGES_SCHEDULE = {
-    1: {
-        "12:00": "👉 {name}, você caiu no lugar certo. O que tá rolando aqui é só uma prévia do que a galera VIP já tá devorando. Quer dar o próximo passo? Clica e entra: {link}",
-        "18:00": "👉 Mano, já vi uns 10 prints da galera VIP hoje rindo da prévia. Tá na cara: quem tá dentro tá no lucro. E você, vai continuar de fora? {link}",
-        "22:00": "👉 Antes de dormir, um aviso: o que você viu hoje não é nem metade. No VIP é o jogo completo. Vai ficar só sonhando? {link}",
+    "1": {
+        "12:00": "🔥 {name}… ACERTOS EM CHEIO! Você acabou de encontrar o QUE SEMPRE PROCUROU! 🎯\n\nAqui é só a PONTA DO ICEBERG… O VIP tem CONTEÚDO QUE VOCÊ NÃO IMAGINA! 💎\n\n🚀 Quer ver TUDO? O próximo passo é UM CLIQUE: {link}",
+        "18:00": "⚠️ ATENÇÃO {name}! HOJE o VIP recebeu CONTEÚDO EXCLUSIVO que NINGUÉM da prévia viu… 🚫\n\nEnquanto você hesita, outros já estão DENTRO aproveitando TUDO! 💰\n\n🎯 Vai ficar só na CURIOSIDADE? {link}",
+        "22:00": "🌙 {name}, ANTES DE DORMIR… Pense: O MELHOR CONTEÚDO rola no VIP! 🏆\n\nAqui é só o APERITIVO… Lá é o BANQUETE COMPLETO! 🍽️\n\n💥 Quer o PRATO PRINCIPAL? {link}"
     },
-    2: {
-        "12:00": "👉 {name}, acordou? O VIP não espera. O que você viu ontem já tá velho, o que subiu hoje só tá lá dentro. Quer acesso real? {link}",
-        "18:00": "👉 Tem dois tipos de gente: quem assiste a prévia e quem manda no VIP. Tá em qual lado? Decide agora: {link}",
-        "22:00": "👉 Enquanto você enrola, o grupo VIP cresce. E cada minuto que passa, mais conteúdo escapa da sua mão. Só tem um jeito de parar essa perda: {link}",
+    "2": {
+        "12:00": "🚨 ALERTA {name}! O VIP está EXPLODINDO com NOVIDADES QUENTES! 🔥\n\nConteúdo que você NUNCA VERÁ na prévia… 📛\n\n🎯 Ainda na DÚVIDA? Isso é ACESSO TOTAL ILIMITADO: {link}",
+        "18:00": "⚖️ TEM DOIS TIPOS DE PESSOAS:\n\n❌ Quem SÓ OBSERVA pela janela\n✅ Quem tem ACESSO TOTAL à festa\n\n🏆 De qual time você quer ser? {link}",
+        "22:00": "⏰ {name}, CADA HORA QUE PASSA… Mais CONTEÚDO EXCLUSIVO chega no VIP! 💎\n\nEnquanto você espera, outros estão APROVEITANDO! 🚀\n\n🔥 Não fique de FORA: {link}"
     },
-    3: {
-        "12:00": "👉 {name}, a pergunta é simples: você tá satisfeito só com migalha ou vai atrás do banquete? O VIP é onde tá o verdadeiro jogo: {link}",
-        "18:00": "👉 Hoje já entrou mais gente no VIP só pra não perder nada. Você ainda aí, só olhando a porta? Tá aberta agora: {link}",
-        "22:00": "👉 Não confunda prévia com conteúdo de verdade. Aqui é só degustação. O prato principal tá te esperando no VIP: {link}",
+    "3": {
+        "12:00": "🍞 {name}, MIGALHAS ou BANQUETE COMPLETO? 🍽️\n\nNo VIP tem TUDO que você REALMENTE PROCURA! 💎\n\n🎯 Chega de ficar só no CHEIRINHO… {link}",
+        "18:00": "👥 {name}, O VIP está RECEBENDO ELOGIOS de quem entrou! ⭐⭐⭐⭐⭐\n\n\"DEVIA TER FEITO ISSO ANTES!\" - dizem os membros… 💬\n\n🚀 Não seja o único a ficar na VONTADE: {link}",
+        "22:00": "🎯 {name}, AQUI É SÃO AS MIGALHAS… 🍞\n\nO CONTEÚDO COMPLETO está no VIP! 🏆\n\n💥 Vamos resolver isso AGORA? {link}"
     },
-    4: {
-        "12:00": "👉 {name}, chega de enrolar. O grupo VIP é onde o pau quebra. A prévia não vai te dar nada além de vontade. Clica e resolve: {link}",
-        "18:00": "👉 Sabe o que todo mundo que já entrou no VIP diz? Que enrolou demais. Você vai ser o próximo arrependido ou vai resolver logo? {link}",
-        "22:00": "👉 Última chamada de hoje: VIP é acesso total, sem censura, sem espera. Tá pronto ou vai dormir na vontade? {link}",
+    "4": {
+        "12:00": "💎 {name}, CHEGA DE ENROLAR! 🚫\n\nO VIP é onde a COISA ACONTECE DE VERDADE! 🔥\n\nEnquanto você pensa, outros já estão LÁ DENTRO! 👥\n\n🎯 Hora de AGIR: {link}",
+        "18:00": "📈 {name}, QUEM ENTROU NO VIP disse: \"ERA TUDO QUE EU PROCURAVA!\" 💬\n\nNão cometa o erro de DEIXAR PARA DEPOIS… ⏰\n\n🚀 O arrependimento é AMARGO: {link}",
+        "22:00": "🚨 ÚLTIMA CHANCE HOJE! 🚨\n\nVIP = ACESSO SEM LIMITES + CONTEÚDO EXCLUSIVO! 💎\n\n⏰ Vai perder essa OPORTUNIDADE? {link}"
     },
-    5: {
-        "12:00": "👉 {name}, mais um dia, mais uma leva de conteúdo no VIP. Aqui fora você só assiste trailer. Vai continuar nesse ciclo? {link}",
-        "18:00": "👉 Tem gente que entrou ontem e já tá dizendo que foi a melhor escolha do mês. E você, ainda pensando? {link}",
-        "22:00": "👉 O que você não pega hoje, não volta amanhã. VIP é movimento, não é museu. Quer ver ou quer perder? {link}",
+    "5": {
+        "12:00": "🔄 {name}, O VIP RECEBE CONTEÚDO NOVO TODO DIA! 📅\n\nEnquanto isso, aqui você só fica SABENDO POR FORA… 🚫\n\n🎯 Chega de ficar na SUPERFÍCIE: {link}",
+        "18:00": "👀 {name}, QUEM ENTROU ONTEM já está APROVEITANDO TUDO! 💎\n\nE você? Ainda na DÚVIDA? 🤔\n\n🚀 Não fique para trás: {link}",
+        "22:00": "⚡ OPORTUNIDADE NÃO FICA ESPERANDO! ⏰\n\nVIP é AGORA ou NUNCA MAIS! 🎯\n\n💥 Essa chance não se repete: {link}"
     },
-    6: {
-        "12:00": "👉 {name}, se em 6 dias você ainda não entrou no VIP, só tem dois motivos: ou tá enrolando ou tá com medo. Qual é o seu caso? {link}",
-        "18:00": "👉 Hoje já caiu mais material no VIP do que você viu em todos esses dias de prévia. E adivinha? Você ficou de fora. Vai corrigir isso agora? {link}",
-        "22:00": "👉 Amanhã é o ultimato. Seu tempo grátis acaba. Se ainda não decidiu, prepara: ou você vai pro VIP ou vai rodar. Antecipe: {link}",
+    "6": {
+        "12:00": "📅 {name}, 6 DIAS DE PRÉVIA… E você ainda NÃO VIU NADA DO QUE REALMENTE IMPORTA! 🚫\n\nHora de MUDAR ESSE JOGO! 🎯\n\n🚀 Chega de migalhas: {link}",
+        "18:00": "💎 O VIP está RECEBENDO TANTO CONTEÚDO que nem comparo com a prévia! 📈\n\nEnquanto você hesita, o ACERVO só CRESCE! 🔥\n\n🎯 Quer ver TUDO? {link}",
+        "22:00": "⏰ {name}, AMANHÃ DECIDE TUDO! 🚨\n\nSua chance está ACABANDO… 💸\n\n⚡ Não deixe para a ÚLTIMA HORA: {link}"
     },
-    7: {
-        "12:00": "👉 {name} — é agora. Hoje é o último dia da sua prévia. Depois disso, adeus acesso gratuito. VIP é vida — entra agora e garante tudo antes que cortem seu acesso: {link}",
-        "18:00": "👉 Cara, se você tá enrolando, olha a real: quem volta depois chora. O VIP tem tudo que você não vai ver mais aqui. Últimas horas — decide AGORA: {link}",
-        "22:00": "👉 {name}, acabou. À meia-noite seu acesso some. Ou você entra no VIP e fica com tudo, ou fica olhando o resto só por fora. Escolha: {link} — é a última chamada.",
-    },
+    "7": {
+        "12:00": "🚨 🚨 🚨 {name} — ÚLTIMO DIA! ⏰\n\nDepois de hoje, ACABOU A PRÉVIA! 🚫\n\nVIP é AGORA ou NUNCA MAIS! 💎\n\n🎯 Garanta seu acesso ANTES QUE FECHE: {link}",
+        "18:00": "⚡ AGORA OU NUNCA! ⚡\n\n{name}, quem deixa para depois SEMPRE SE ARREPENDE! 😭\n\nVIP é GARANTIA DE ACESSO TOTAL! 🏆\n\n🔥 Não seja mais um a chorar: {link}",
+        "22:00": "🚨 🚨 🚨 {name} — ÚLTIMA CHAMADA! 🎯\n\n⏰ MEIA-NOITE E ACABOU! 💸\n\nÉ VIP ou é FORA! 🚫\n\n💥 SUA ÚLTIMA CHANCE: {link}"
+    }
+}
+{
     "retarget": {
-        1: {
-            "12:00": "👉 {name}, você perdeu o acesso à prévia. Quem tá lá dentro tá aproveitando full. Voltar só no VIP — entra agora: {link}",
-            "18:00": "👉 {name}, alguém acabou de postar algo INSANO no VIP. Você ficou de fora. Quer voltar? Só no VIP: {link}",
-            "22:00": "👉 Última chance do dia — se não você perde o que já rolou. Promo? Só por pouco tempo: {discount_link}",
+        "1": {
+            "12:00": "💔 {name}, SEU ACESSO À PRÉVIA ACABOU… 😢\n\nMas o VIP continua BOMBANDO com CONTEÚDO EXCLUSIVO! 🔥\n\n🎯 Quer VOLTAR para o PARAÍSO? {link}",
+            "18:00": "🚨 {name}, AGORA MESMO: CONTEÚDO NOVO NO VIP! 📹\n\nVocê está PERDENDO O MELHOR! 💎\n\n⚡ Volta AGORA: {link}",
+            "22:00": "🎁 CONDIÇÃO ESPECIAL SÓ HOJE! 💰\n\nÚltima chance para voltar com DESCONTO RELÂMPAGO! ⚡\n\n🚀 Não perca: {discount_link}"
         },
-        2: {
-            "12:00": "👉 A real é: quem não entrou já se arrependeu. Não seja mais um que ficou só na vontade. VIP agora: {link}",
-            "18:00": "👉 {name}, você tá perdendo vantagem. Quem comprou já tá consumindo conteúdo exclusivo. Volta logo: {link}",
-            "22:00": "👉 Oferta final do dia — desconto relâmpago pra quem agir agora: {discount_link}",
+        "2": {
+            "12:00": "👥 {name}, QUEM ENTROU NÃO SE ARREPENDEU! ⭐⭐⭐⭐⭐\n\n\"MELHOR DECISÃO!\" - dizem os membros VIP… 💬\n\n💔 Não fique só na SAUDADE: {link}",
+            "18:00": "📈 {name}, O VIP está CADA VEZ MELHOR! 🚀\n\nNovos conteúdos TODO DIA! 📅\n\n🎯 Hora de RECONSIDERAR? {link}",
+            "22:00": "🔥 OFERTA ESPECIAL RELÂMPAGO! ⚡\n\nSó até hoje: CONDIÇÕES IMBATÍVEIS! 💎\n\n⏰ Últimas horas: {discount_link}"
         },
-        3: {
-            "12:00": "👉 Último dia do resgate, {name}. Depois disso a oferta some. Quer entrar pro VIP ou vai ficar só lamentando? {link}",
-            "18:00": "👉 Final real: é agora ou nunca. Decisão na sua mão — VIP e fim da história: {link}",
-            "22:00": "👉 É a última mensagem que você vai receber. Após isso, nada. Não diga que não avisei. Última chance com desconto: {discount_link}",
-        },
-    },
+        "3": {
+            "12:00": "⏰ {name}, ÚLTIMA OPORTUNIDADE DE RESGATE! 🚨\n\nDepois disso, ERA ISSO… 💸\n\n🎯 Não queime sua chance: {link}",
+            "18:00": "⚡ DECISÃO FINAL: É AGORA OU NUNCA MAIS! 🎯\n\n{name}, o VIP está te ESPERANDO! 💎\n\n🚀 Última chamada: {link}",
+            "22:00": "🚨 🚨 🚨 ÚLTIMA MENSAGEM! ⚡\n\n{name}, NÃO IGNORE ESTA CHANCE! 💔\n\n🎁 OFERTA FINAL COM DESCONTO: {discount_link}\n\n💥 DEPOIS DISSO, SILÊNCIO TOTAL…"
+        }
+    }
 }
 
 # -------------------------
