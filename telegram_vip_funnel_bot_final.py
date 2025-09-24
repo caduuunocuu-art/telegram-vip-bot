@@ -57,8 +57,8 @@ VIDEO_URL = os.getenv("VIDEO_URL", "https://botdiscarado.com.br/video.mp4/leve.m
 ADMINS = set(map(int, os.getenv("ADMINS", "7708241274").split(",")))
 
 # CTA persuasivo (usa {name}) — será usado na legenda do vídeo
-CTA_TEXT = (
-    "⚡ ATENÇÃO, {name}! SEU ACESSO GRATUITO ESTÁ SE ESGOTANDO! ⏰
+CTA_TEXT = """
+⚡ ATENÇÃO, {name}! SEU ACESSO GRATUITO ESTÁ SE ESGOTANDO! ⏰
 
 🎯 ENQUANTO VOCÊ LÊ ESTA MENSAGEM:
 ✅ Membros VIP já estão acessando CONTEÚDO EXCLUSIVO
@@ -74,8 +74,8 @@ CTA_TEXT = (
 🚨 NÃO SEJA O ÚLTIMO DA FILA!
 Quem espera SEMPRE fica para trás...
 
-👉 FALE AGORA COM O BOT: @Grupo_Vip_BR2bot"
-)
+👉 FALE AGORA COM O BOT: @Grupo_Vip_BR2bot
+"""
 
 # Horários configuráveis (formato "HH:MM")
 MESSAGE_HOURS = os.getenv("MESSAGE_HOURS", "12:00,18:00,22:00").split(",")
