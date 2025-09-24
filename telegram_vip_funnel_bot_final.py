@@ -465,6 +465,16 @@ async def handle_chat_member_update(update: ChatMemberUpdated):
             # Novo usuário (ou ainda não marcado como joined)
             elif not user_info or not user_info[4]:  # joined_group flag
                 await update_user_joined(user_id, user.username, user.first_name, user.last_name)
+
+                # --- AÇÃO ADICIONADA: envia vídeo CTA imediato na entrada do grupo ---
+                try:
+                    caption = CTA_TEXT.format(name=user.first_name or "Usuário")
+                    await bot.send_video(user_id, VIDEO_URL, caption=caption)
+                    logger.info(f"Vídeo CTA de boas-vindas enviado para {user_id}")
+                except Exception as e:
+                    logger.error(f"Erro ao enviar vídeo CTA de boas-vindas para {user_id}: {e}")
+                # --- fim da ação adicionada ---
+
                 await schedule_user_messages(user_id, user.username, user.first_name, user.last_name)
 
                 # Mensagem imediata (dia 1) — enviamos a primeira mensagem após pequeno delay (configurável)
