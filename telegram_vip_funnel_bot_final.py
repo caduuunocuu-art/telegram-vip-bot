@@ -213,6 +213,41 @@ async def reset_usuario(message: types.Message):
 
     await message.answer(f"✅ Usuário {user_id} foi resetado e terá acesso a mais {DAYS_OF_PREVIEW} dias.")
 
+# -------------------------
+# Enviar vídeo quando entra no grupo
+# -------------------------
+@dp.chat_member_handler(chat_id=PREVIEWS_GROUP_ID)
+async def handle_chat_member_update(update: ChatMemberUpdated):
+    if update.new_chat_member.status == 'member':
+        user = update.new_chat_member.user
+        user_id = user.id
+
+        # Verifica se já entrou antes
+        async with aiosqlite.connect(DB_FILE) as db:
+            cursor = await db.execute("SELECT joined_group FROM users WHERE user_id = ?", (user_id,))
+            row = await cursor.fetchone()
+
+        if row is None:
+            # Novo usuário
+            async with aiosqlite.connect(DB_FILE) as db:
+                await db.execute(
+                    "INSERT INTO users (user_id, username, joined_group) VALUES (?, ?, ?)",
+                    (user_id, user.username, 1)
+                )
+                await db.commit()
+        elif row[0] == 0:
+            # Marca como entrou
+            async with aiosqlite.connect(DB_FILE) as db:
+                await db.execute("UPDATE users SET joined_group = 1 WHERE user_id = ?", (user_id,))
+                await db.commit()
+
+        # Agenda mensagens do funil
+        await schedule_user_messages(user_id)
+
+        # Envia vídeo de vendas após delay
+        await asyncio.sleep(SEND_IMMEDIATE_DELAY_SECONDS)
+        await safe_send_message(user_id, f"🔥 Olá {user.first_name or 'mano'}! Confira seu vídeo de prévia e entre agora: {PURCHASE_LINK}")
+
 async def on_startup(dp):
     await init_db()
     scheduler.start()
