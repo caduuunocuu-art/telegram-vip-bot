@@ -58,10 +58,23 @@ ADMINS = set(map(int, os.getenv("ADMINS", "7708241274").split(",")))
 
 # CTA persuasivo (usa {name}) — será usado na legenda do vídeo
 CTA_TEXT = (
-    "🔥 Seu acesso gratuito está terminando, {name}!\n\n"
-    "No VIP você tem acesso completo e exclusivo, sem limitações.\n"
-    "Não deixe para depois — quem entra agora garante todos os benefícios.\n\n"
-    "👉 Fale agora com o bot: @Grupo_Vip_BR2bot"
+    "⚡ ATENÇÃO, {name}! SEU ACESSO GRATUITO ESTÁ SE ESGOTANDO! ⏰
+
+🎯 ENQUANTO VOCÊ LÊ ESTA MENSAGEM:
+✅ Membros VIP já estão acessando CONTEÚDO EXCLUSIVO
+✅ Novos materiais sendo adicionados AGORA MESMO
+✅ Você está PERDENDO as MELHORES PARTES!
+
+💎 NO VIP VOCÊ GARANTE:
+🚀 ACESSO COMPLETO 24/7
+🔥 CONTEÚDO 100% EXCLUSIVO
+🎯 SEM CENSURA • SEM LIMITES
+⭐ ATUALIZAÇÕES DIÁRIAS
+
+🚨 NÃO SEJA O ÚLTIMO DA FILA!
+Quem espera SEMPRE fica para trás...
+
+👉 FALE AGORA COM O BOT: @Grupo_Vip_BR2bot"
 )
 
 # Horários configuráveis (formato "HH:MM")
@@ -204,11 +217,19 @@ async def cmd_start(message: types.Message):
             await db.commit()
 
         start_text = (
-            "🎉 Bem-vindo ao VIP Funnel Bot!\n\n"
-            "Clique no link abaixo para entrar no grupo de prévias:\n{invite_link}\n\n"
-            "• Você terá acesso por {days} dias\n"
-            "• Depois disso, só no VIP\n"
-            "• Sistema anti-retorno ativo (não tente voltar sem pagar)"
+            "🎯 ACESSO LIBERADO - GRUPO PRÉVIAS 🎯
+
+✅ Seu acesso temporário foi ativado com sucesso!
+
+🔗 Entre agora no grupo:
+{invite_link}
+
+🚨 Informações importantes:
+• Duração: {days} dias gratuitos
+• Sistema anti-retorno ativo (não tente voltar sem pagar)
+• O VIP oferece benefícios completos
+
+👉 Dica: Entre AGORA mesmo e não perca nenhum conteúdo!"
         ).format(invite_link=PREVIEWS_GROUP_INVITE_LINK, days=DAYS_OF_PREVIEW)
 
         await message.answer(start_text)
