@@ -15,7 +15,7 @@ from aiogram.utils.exceptions import (
 
 API_TOKEN = os.getenv("TG_BOT_TOKEN")
 PREVIEWS_GROUP_ID = int(os.getenv("PREVIEWS_GROUP_ID"))
-PREVIEWS_GROUP_INVITE_LINK = os.getenv("PREVIEWS_GROUP_INVITE_LINK", "https://t.me/seuGrupoPreview")
+PREVIEWS_GROUP_INVITE_LINK = os.getenv("PREVIEWS_GROUP_INVITE_LINK", "https://t.me/+wYpQExxUOzkyNDk5")
 VIDEO_FILE_ID = os.getenv("VIDEO_FILE_ID")
 PURCHASE_LINK = os.getenv("PURCHASE_LINK")
 ADMINS = os.getenv("ADMINS", "").split(",")
