@@ -217,7 +217,7 @@ async def cmd_start(message: types.Message):
             await db.commit()
 
         start_text = (
-            "🎯 ACESSO LIBERADO - GRUPO PRÉVIAS 🎯
+    """🎯 ACESSO LIBERADO - GRUPO PRÉVIAS 🎯
 
 ✅ Seu acesso temporário foi ativado com sucesso!
 
@@ -229,8 +229,9 @@ async def cmd_start(message: types.Message):
 • Sistema anti-retorno ativo (não tente voltar sem pagar)
 • O VIP oferece benefícios completos
 
-👉 Dica: Entre AGORA mesmo e não perca nenhum conteúdo!"
-        ).format(invite_link=PREVIEWS_GROUP_INVITE_LINK, days=DAYS_OF_PREVIEW)
+👉 Dica: Entre AGORA mesmo e não perca nenhum conteúdo!"""
+)
+.format(invite_link=PREVIEWS_GROUP_INVITE_LINK, days=DAYS_OF_PREVIEW)
 
         await message.answer(start_text)
         logger.info(f"Usuário {user_id} ({first_name}) recebeu link de convite via /start")
