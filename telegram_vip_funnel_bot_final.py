@@ -15,6 +15,7 @@ from aiogram.utils.exceptions import (
 
 API_TOKEN = os.getenv("TG_BOT_TOKEN")
 PREVIEWS_GROUP_ID = int(os.getenv("PREVIEWS_GROUP_ID"))
+PREVIEWS_GROUP_INVITE_LINK = os.getenv("PREVIEWS_GROUP_INVITE_LINK", "https://t.me/seuGrupoPreview")
 VIDEO_FILE_ID = os.getenv("VIDEO_FILE_ID")
 PURCHASE_LINK = os.getenv("PURCHASE_LINK")
 ADMINS = os.getenv("ADMINS", "").split(",")
@@ -23,6 +24,7 @@ ADMINS = os.getenv("ADMINS", "").split(",")
 TIMEZONE = pytz.timezone("America/Sao_Paulo")
 MAX_MESSAGE_RETRIES = 3
 SEND_IMMEDIATE_DELAY_SECONDS = 5
+DAYS_OF_PREVIEW = int(os.getenv("DAYS_OF_PREVIEW", "7"))
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,58 +35,67 @@ scheduler = AsyncIOScheduler(timezone=TIMEZONE)
 
 DB_FILE = "bot_database.db"
 
-# Mensagens estruturadas
+# Mensagem de boas-vindas (quando der /start)
+WELCOME_MESSAGE = (
+    "🎉 Bem-vindo ao VIP Funnel Bot!\n\n"
+    "Clique no link abaixo para entrar no grupo de prévias:\n{invite_link}\n\n"
+    "• Você terá acesso por {days} dias\n"
+    "• Depois disso, só no VIP\n"
+    "• Sistema anti-retorno ativo (não tente voltar sem pagar)"
+)
+
+# Mensagens estruturadas (funil completo)
 MESSAGES_SCHEDULE = {
     1: {
-        "12:00": "{name}, você caiu no lugar certo... {link}",
-        "18:00": "Mano, já vi uns 10 prints... {link}",
-        "22:00": "Antes de dormir, um aviso... {link}",
+        "12:00": "👉 {name}, você caiu no lugar certo. O que tá rolando aqui é só uma prévia do que a galera VIP já tá devorando. Quer dar o próximo passo? Clica e entra: {link}",
+        "18:00": "👉 Mano, já vi uns 10 prints da galera VIP hoje rindo da prévia. Tá na cara: quem tá dentro tá no lucro. E você, vai continuar de fora? {link}",
+        "22:00": "👉 Antes de dormir, um aviso: o que você viu hoje não é nem metade. No VIP é o jogo completo. Vai ficar só sonhando? {link}",
     },
     2: {
-        "12:00": "{name}, acordou? O VIP não espera... {link}",
-        "18:00": "Tem dois tipos de gente... {link}",
-        "22:00": "Enquanto você enrola... {link}",
+        "12:00": "👉 {name}, acordou? O VIP não espera. O que você viu ontem já tá velho, o que subiu hoje só tá lá dentro. Quer acesso real? {link}",
+        "18:00": "👉 Tem dois tipos de gente: quem assiste a prévia e quem manda no VIP. Tá em qual lado? Decide agora: {link}",
+        "22:00": "👉 Enquanto você enrola, o grupo VIP cresce. E cada minuto que passa, mais conteúdo escapa da sua mão. Só tem um jeito de parar essa perda: {link}",
     },
     3: {
-        "12:00": "{name}, a pergunta é simples... {link}",
-        "18:00": "Hoje já entrou mais gente... {link}",
-        "22:00": "Não confunda prévia... {link}",
+        "12:00": "👉 {name}, a pergunta é simples: você tá satisfeito só com migalha ou vai atrás do banquete? O VIP é onde tá o verdadeiro jogo: {link}",
+        "18:00": "👉 Hoje já entrou mais gente no VIP só pra não perder nada. Você ainda aí, só olhando a porta? Tá aberta agora: {link}",
+        "22:00": "👉 Não confunda prévia com conteúdo de verdade. Aqui é só degustação. O prato principal tá te esperando no VIP: {link}",
     },
     4: {
-        "12:00": "{name}, chega de enrolar... {link}",
-        "18:00": "Sabe o que todo mundo diz?... {link}",
-        "22:00": "Última chamada de hoje... {link}",
+        "12:00": "👉 {name}, chega de enrolar. O grupo VIP é onde o pau quebra. A prévia não vai te dar nada além de vontade. Clica e resolve: {link}",
+        "18:00": "👉 Sabe o que todo mundo que já entrou no VIP diz? Que enrolou demais. Você vai ser o próximo arrependido ou vai resolver logo? {link}",
+        "22:00": "👉 Última chamada de hoje: VIP é acesso total, sem censura, sem espera. Tá pronto ou vai dormir na vontade? {link}",
     },
     5: {
-        "12:00": "{name}, mais um dia, mais uma leva... {link}",
-        "18:00": "Tem gente que entrou ontem... {link}",
-        "22:00": "O que você não pega hoje... {link}",
+        "12:00": "👉 {name}, mais um dia, mais uma leva de conteúdo no VIP. Aqui fora você só assiste trailer. Vai continuar nesse ciclo? {link}",
+        "18:00": "👉 Tem gente que entrou ontem e já tá dizendo que foi a melhor escolha do mês. E você, ainda pensando? {link}",
+        "22:00": "👉 O que você não pega hoje, não volta amanhã. VIP é movimento, não é museu. Quer ver ou quer perder? {link}",
     },
     6: {
-        "12:00": "{name}, se em 6 dias você ainda não entrou... {link}",
-        "18:00": "Hoje já caiu mais material... {link}",
-        "22:00": "Amanhã é o ultimato... {link}",
+        "12:00": "👉 {name}, se em 6 dias você ainda não entrou no VIP, só tem dois motivos: ou tá enrolando ou tá com medo. Qual é o seu caso? {link}",
+        "18:00": "👉 Hoje já caiu mais material no VIP do que você viu em todos esses dias de prévia. E adivinha? Você ficou de fora. Vai corrigir isso agora? {link}",
+        "22:00": "👉 Amanhã é o ultimato. Seu tempo grátis acaba. Se ainda não decidiu, prepara: ou você vai pro VIP ou vai rodar. Antecipe: {link}",
     },
     7: {
-        "12:00": "⚠️ Último dia de acesso grátis... {link}",
-        "18:00": "Seu tempo tá acabando... {link}",
-        "22:00": "Game over: amanhã você roda... {link}",
+        "12:00": "👉 {name} — é agora. Hoje é o último dia da sua prévia. Depois disso, adeus acesso gratuito. VIP é vida — entra agora e garante tudo antes que cortem seu acesso: {link}",
+        "18:00": "👉 Cara, se você tá enrolando, olha a real: quem volta depois chora. O VIP tem tudo que você não vai ver mais aqui. Últimas horas — decide AGORA: {link}",
+        "22:00": "👉 {name}, acabou. À meia-noite seu acesso some. Ou você entra no VIP e fica com tudo, ou fica olhando o resto só por fora. Escolha: {link} — é a última chamada.",
     },
     "retarget": {
         1: {
-            "12:00": "Você já tá fora do grupo... {link}",
-            "18:00": "A sensação de ficar de fora... {link}",
-            "22:00": "Enquanto você pensa... {link}",
+            "12:00": "👉 {name}, você perdeu o acesso à prévia. Quem tá lá dentro tá aproveitando full. Voltar só no VIP — entra agora: {link}",
+            "18:00": "👉 {name}, alguém acabou de postar algo INSANO no VIP. Você ficou de fora. Quer voltar? Só no VIP: {link}",
+            "22:00": "👉 Última chance do dia — se não você perde o que já rolou. Promo? Só por pouco tempo: {link}",
         },
         2: {
-            "12:00": "Mais um dia longe do conteúdo... {link}",
-            "18:00": "Todo mundo evoluindo no VIP... {link}",
-            "22:00": "Dormir com arrependimento... {link}",
+            "12:00": "👉 A real é: quem não entrou já se arrependeu. Não seja mais um que ficou só na vontade. VIP agora: {link}",
+            "18:00": "👉 {name}, você tá perdendo vantagem. Quem comprou já tá consumindo conteúdo exclusivo. Volta logo: {link}",
+            "22:00": "👉 Oferta final do dia — desconto relâmpago pra quem agir agora: {link}",
         },
         3: {
-            "12:00": "Último chamado: VIP ou nada... {link}",
-            "18:00": "Sua última chance tá na sua frente... {link}",
-            "22:00": "Game over: sem VIP não tem mais nada... {link}",
+            "12:00": "👉 Último dia do resgate, {name}. Depois disso a oferta some. Quer entrar pro VIP ou vai ficar só lamentando? {link}",
+            "18:00": "👉 Final real: é agora ou nunca. Decisão na sua mão — VIP e fim da história: {link}",
+            "22:00": "👉 É a última mensagem que você vai receber. Após isso, nada. Não diga que não avisei. Última chance com desconto: {link}",
         },
     },
 }
@@ -138,7 +149,7 @@ async def send_scheduled_message(user_id, day, hour, is_retarget=False):
         formatted = message.format(
             name="mano",
             days=day,
-            remaining=7-day if not is_retarget else 3-day,
+            remaining=DAYS_OF_PREVIEW-day if not is_retarget else 3-day,
             link=PURCHASE_LINK
         )
         await safe_send_message(user_id, formatted)
@@ -175,7 +186,12 @@ async def cmd_start(message: types.Message):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute("INSERT OR IGNORE INTO users (user_id, username) VALUES (?, ?)", (user_id, message.from_user.username))
         await db.commit()
-    await message.answer("Bem-vindo! Você foi adicionado ao funil.")
+
+    welcome_text = WELCOME_MESSAGE.format(
+        invite_link=PREVIEWS_GROUP_INVITE_LINK,
+        days=DAYS_OF_PREVIEW
+    )
+    await message.answer(welcome_text)
     await schedule_user_messages(user_id)
 
 async def on_startup(dp):
