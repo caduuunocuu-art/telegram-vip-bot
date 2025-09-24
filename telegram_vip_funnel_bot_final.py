@@ -15,7 +15,7 @@ from aiogram.utils.exceptions import (
 
 API_TOKEN = os.getenv("TG_BOT_TOKEN")
 PREVIEWS_GROUP_ID = int(os.getenv("PREVIEWS_GROUP_ID"))
-PREVIEWS_GROUP_INVITE_LINK = os.getenv("PREVIEWS_GROUP_INVITE_LINK", "https://t.me/+wYpQExxUOzkyNDk5")
+PREVIEWS_GROUP_INVITE_LINK = os.getenv("PREVIEWS_GROUP_INVITE_LINK")
 VIDEO_FILE_ID = os.getenv("VIDEO_FILE_ID")
 PURCHASE_LINK = os.getenv("PURCHASE_LINK")
 ADMINS = os.getenv("ADMINS", "").split(",")
@@ -24,7 +24,7 @@ ADMINS = os.getenv("ADMINS", "").split(",")
 TIMEZONE = pytz.timezone("America/Sao_Paulo")
 MAX_MESSAGE_RETRIES = 3
 SEND_IMMEDIATE_DELAY_SECONDS = 5
-DAYS_OF_PREVIEW = int(os.getenv("DAYS_OF_PREVIEW", "7"))
+DAYS_OF_PREVIEW = 7
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,15 +34,6 @@ dp = Dispatcher(bot)
 scheduler = AsyncIOScheduler(timezone=TIMEZONE)
 
 DB_FILE = "bot_database.db"
-
-# Mensagem de boas-vindas (quando der /start)
-WELCOME_MESSAGE = (
-    "🎉 Bem-vindo ao VIP Funnel Bot!\n\n"
-    "Clique no link abaixo para entrar no grupo de prévias:\n{invite_link}\n\n"
-    "• Você terá acesso por {days} dias\n"
-    "• Depois disso, só no VIP\n"
-    "• Sistema anti-retorno ativo (não tente voltar sem pagar)"
-)
 
 # Mensagens estruturadas (funil completo)
 MESSAGES_SCHEDULE = {
@@ -85,17 +76,17 @@ MESSAGES_SCHEDULE = {
         1: {
             "12:00": "👉 {name}, você perdeu o acesso à prévia. Quem tá lá dentro tá aproveitando full. Voltar só no VIP — entra agora: {link}",
             "18:00": "👉 {name}, alguém acabou de postar algo INSANO no VIP. Você ficou de fora. Quer voltar? Só no VIP: {link}",
-            "22:00": "👉 Última chance do dia — se não você perde o que já rolou. Promo? Só por pouco tempo: {link}",
+            "22:00": "👉 Última chance do dia — se não você perde o que já rolou. Promo? Só por pouco tempo: {discount_link}",
         },
         2: {
             "12:00": "👉 A real é: quem não entrou já se arrependeu. Não seja mais um que ficou só na vontade. VIP agora: {link}",
             "18:00": "👉 {name}, você tá perdendo vantagem. Quem comprou já tá consumindo conteúdo exclusivo. Volta logo: {link}",
-            "22:00": "👉 Oferta final do dia — desconto relâmpago pra quem agir agora: {link}",
+            "22:00": "👉 Oferta final do dia — desconto relâmpago pra quem agir agora: {discount_link}",
         },
         3: {
             "12:00": "👉 Último dia do resgate, {name}. Depois disso a oferta some. Quer entrar pro VIP ou vai ficar só lamentando? {link}",
             "18:00": "👉 Final real: é agora ou nunca. Decisão na sua mão — VIP e fim da história: {link}",
-            "22:00": "👉 É a última mensagem que você vai receber. Após isso, nada. Não diga que não avisei. Última chance com desconto: {link}",
+            "22:00": "👉 É a última mensagem que você vai receber. Após isso, nada. Não diga que não avisei. Última chance com desconto: {discount_link}",
         },
     },
 }
@@ -149,8 +140,9 @@ async def send_scheduled_message(user_id, day, hour, is_retarget=False):
         formatted = message.format(
             name="mano",
             days=day,
-            remaining=DAYS_OF_PREVIEW-day if not is_retarget else 3-day,
-            link=PURCHASE_LINK
+            remaining=7-day if not is_retarget else 3-day,
+            link=PURCHASE_LINK,
+            discount_link=PURCHASE_LINK
         )
         await safe_send_message(user_id, formatted)
     except Exception as e:
@@ -186,13 +178,40 @@ async def cmd_start(message: types.Message):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute("INSERT OR IGNORE INTO users (user_id, username) VALUES (?, ?)", (user_id, message.from_user.username))
         await db.commit()
-
-    welcome_text = WELCOME_MESSAGE.format(
-        invite_link=PREVIEWS_GROUP_INVITE_LINK,
-        days=DAYS_OF_PREVIEW
+    welcome_message = (
+        f"🎉 Bem-vindo ao VIP Funnel Bot!\n\n"
+        f"Clique no link abaixo para entrar no grupo de prévias:\n"
+        f"{PREVIEWS_GROUP_INVITE_LINK}\n\n"
+        f"• Você terá acesso por {DAYS_OF_PREVIEW} dias\n"
+        f"• Depois disso, só no VIP\n"
+        f"• Sistema anti-retorno ativo (não tente voltar sem pagar)"
     )
-    await message.answer(welcome_text)
+    await message.answer(welcome_message)
     await schedule_user_messages(user_id)
+
+@dp.message_handler(commands=["reset_usuario"])
+async def reset_usuario(message: types.Message):
+    if str(message.from_user.id) not in ADMINS:
+        await message.answer("❌ Você não tem permissão para usar este comando.")
+        return
+
+    args = message.get_args().strip()
+    if not args.isdigit():
+        await message.answer("⚠️ Use assim: /reset_usuario <user_id>")
+        return
+
+    user_id = int(args)
+    async with aiosqlite.connect(DB_FILE) as db:
+        await db.execute("""
+            UPDATE users
+            SET removed = 0, banned = 0
+            WHERE user_id = ?
+        """, (user_id,))
+        await db.commit()
+
+    await schedule_user_messages(user_id)
+
+    await message.answer(f"✅ Usuário {user_id} foi resetado e terá acesso a mais {DAYS_OF_PREVIEW} dias.")
 
 async def on_startup(dp):
     await init_db()
