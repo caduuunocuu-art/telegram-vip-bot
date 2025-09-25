@@ -243,7 +243,7 @@ async def cmd_start(message: types.Message):
 # Funções auxiliares (DB + envio)
 # -------------------------
 async def safe_send_message(chat_id: int, text: str, name_for_cta: str, max_retries: int = MAX_MESSAGE_RETRIES) -> bool:
-    \"\"\"Envia texto + vídeo com CTA, respeitando limites e re-tentativas.\"\"\"
+    """Envia texto + vídeo com CTA, respeitando limites e re-tentativas."""
     attempt = 0
     while attempt < max_retries:
         try:
