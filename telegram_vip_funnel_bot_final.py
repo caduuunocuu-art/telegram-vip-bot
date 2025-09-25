@@ -243,7 +243,7 @@ async def cmd_start(message: types.Message):
 # Funções auxiliares (DB + envio)
 # -------------------------
 async def safe_send_message(chat_id: int, text: str, name_for_cta: str, max_retries: int = MAX_MESSAGE_RETRIES) -> bool:
-    """Envia texto + vídeo com CTA, respeitando limites e re-tentativas."""
+    \"\"\"Envia texto + vídeo com CTA, respeitando limites e re-tentativas.\"\"\"
     attempt = 0
     while attempt < max_retries:
         try:
@@ -340,10 +340,12 @@ async def send_scheduled_message(user_id: int, day: int, hour: str, is_retarget:
 
     # Seleciona a mensagem conforme schedule ou retarget
     try:
+        day_key = str(day)  # CORREÇÃO: converter int para str para lookup nas chaves do dict
+
         if not is_retarget:
-            message_template = MESSAGES_SCHEDULE.get(day, {}).get(hour)
+            message_template = MESSAGES_SCHEDULE.get(day_key, {}).get(hour)
         else:
-            message_template = MESSAGES_SCHEDULE.get("retarget", {}).get(day, {}).get(hour)
+            message_template = MESSAGES_SCHEDULE.get("retarget", {}).get(day_key, {}).get(hour)
 
         if not message_template:
             logger.debug(f"Nenhuma mensagem configurada para day={day} hour={hour} retarget={is_retarget}")
