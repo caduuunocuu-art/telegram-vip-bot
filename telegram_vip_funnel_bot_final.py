@@ -160,22 +160,18 @@ MESSAGES_SCHEDULE = {
         "12:00": "🚨 🚨 🚨 {name} — ÚLTIMO DIA! ⏰\n\nDepois de hoje, ACABOU A PRÉVIA! 🚫\n\nVIP é AGORA ou NUNCA MAIS! 💎\n\n🎯 Garanta seu acesso ANTES QUE FECHE: {link}",
         "18:00": "⚡ AGORA OU NUNCA! ⚡\n\n{name}, quem deixa para depois SEMPRE SE ARREPENDE! 😭\n\nVIP é GARANTIA DE ACESSO TOTAL! 🏆\n\n🔥 Não seja mais um a chorar: {link}",
         "22:00": "🚨 🚨 🚨 {name} — ÚLTIMA CHAMADA! 🎯\n\n⏰ MEIA-NOITE E ACABOU! 💸\n\nÉ VIP ou é FORA! 🚫\n\n💥 SUA ÚLTIMA CHANCE: {link}"
-    }
-}
-{
+    },
+
     "retarget": {
-        "1": {
-            "12:00": "💔 {name}, SEU ACESSO À PRÉVIA ACABOU… 😢\n\nMas o VIP continua BOMBANDO com CONTEÚDO EXCLUSIVO! 🔥\n\n🎯 Quer VOLTAR para o PARAÍSO? {link}",
+        "1": { "12:00": "💔 {name}, SEU ACESSO À PRÉVIA ACABOU… 😢\n\nMas o VIP continua BOMBANDO com CONTEÚDO EXCLUSIVO! 🔥\n\n🎯 Quer VOLTAR para o PARAÍSO? {link}",
             "18:00": "🚨 {name}, AGORA MESMO: CONTEÚDO NOVO NO VIP! 📹\n\nVocê está PERDENDO O MELHOR! 💎\n\n⚡ Volta AGORA: {link}",
             "22:00": "🎁 CONDIÇÃO ESPECIAL SÓ HOJE! 💰\n\nÚltima chance para voltar com DESCONTO RELÂMPAGO! ⚡\n\n🚀 Não perca: {discount_link}"
         },
-        "2": {
-            "12:00": "👥 {name}, QUEM ENTROU NÃO SE ARREPENDEU! ⭐⭐⭐⭐⭐\n\n\"MELHOR DECISÃO!\" - dizem os membros VIP… 💬\n\n💔 Não fique só na SAUDADE: {link}",
+        "2": {"12:00": "👥 {name}, QUEM ENTROU NÃO SE ARREPENDEU! ⭐⭐⭐⭐⭐\n\n\"MELHOR DECISÃO!\" - dizem os membros VIP… 💬\n\n💔 Não fique só na SAUDADE: {link}",
             "18:00": "📈 {name}, O VIP está CADA VEZ MELHOR! 🚀\n\nNovos conteúdos TODO DIA! 📅\n\n🎯 Hora de RECONSIDERAR? {link}",
             "22:00": "🔥 OFERTA ESPECIAL RELÂMPAGO! ⚡\n\nSó até hoje: CONDIÇÕES IMBATÍVEIS! 💎\n\n⏰ Últimas horas: {discount_link}"
         },
-        "3": {
-            "12:00": "⏰ {name}, ÚLTIMA OPORTUNIDADE DE RESGATE! 🚨\n\nDepois disso, ERA ISSO… 💸\n\n🎯 Não queime sua chance: {link}",
+        "3": { "12:00": "⏰ {name}, ÚLTIMA OPORTUNIDADE DE RESGATE! 🚨\n\nDepois disso, ERA ISSO… 💸\n\n🎯 Não queime sua chance: {link}",
             "18:00": "⚡ DECISÃO FINAL: É AGORA OU NUNCA MAIS! 🎯\n\n{name}, o VIP está te ESPERANDO! 💎\n\n🚀 Última chamada: {link}",
             "22:00": "🚨 🚨 🚨 ÚLTIMA MENSAGEM! ⚡\n\n{name}, NÃO IGNORE ESTA CHANCE! 💔\n\n🎁 OFERTA FINAL COM DESCONTO: {discount_link}\n\n💥 DEPOIS DISSO, SILÊNCIO TOTAL…"
         }
@@ -216,7 +212,7 @@ async def cmd_start(message: types.Message):
             )
             await db.commit()
 
-        start_text =start_text = """🎯 ACESSO LIBERADO - GRUPO PRÉVIAS 🎯
+        start_text = """🎯 ACESSO LIBERADO - GRUPO PRÉVIAS 🎯
 
 ✅ Seu acesso temporário foi ativado com sucesso!
 
@@ -285,10 +281,15 @@ async def update_user_joined(user_id: int, username: str, first_name: str, last_
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             """
-            INSERT OR REPLACE INTO users (user_id, username, first_name, last_name, joined_group, join_time, removed, banned)
-            VALUES (?, ?, ?, ?, 1, ?, 0, 0)
+            INSERT INTO users (user_id, username, first_name, last_name, joined_group, join_time)
+            VALUES (?, ?, ?, ?, 1, ?)
+            ON CONFLICT(user_id) DO UPDATE SET 
+                username=excluded.username,
+                first_name=excluded.first_name,
+                last_name=excluded.last_name,
+                joined_group=1
             """,
-            (user_id, username, first_name, last_name, join_time),
+            (user_id, username, first_name, last_name, join_time)
         )
         await db.commit()
 
@@ -432,10 +433,9 @@ async def schedule_user_messages(user_id: int, username: str, first_name: str, l
 # -------------------------
 async def remove_user_from_group(user_id: int):
     try:
-        # Tenta remover/banir e depois desbanir para "kick" efetivo
         await bot.ban_chat_member(PREVIEWS_GROUP_ID, user_id)
-        # espera breve para garantir o kick (60s como antes)
-        await asyncio.sleep(60)
+        # espera breve, menor que 60s
+        await asyncio.sleep(5)
         await bot.unban_chat_member(PREVIEWS_GROUP_ID, user_id)
 
         await mark_user_removed(user_id)
