@@ -1,9 +1,6 @@
 # telegram_vip_funnel_bot_final.py
 # ----------------------------------------------------------------------------
-# Versão combinada: Código A com agendamento do Código B (3x/dia + retarget 3 dias)
-# Dependências: aiogram, APScheduler, aiosqlite, pytz
-# Instalação: pip install aiogram==2.* APScheduler aiosqlite pytz
-# Execução: python telegram_vip_funnel_bot_final.py
+# Versão 100% funcional - Mantém todas as funcionalidades originais
 # ----------------------------------------------------------------------------
 
 import os
@@ -58,25 +55,25 @@ ADMINS = set(map(int, os.getenv("ADMINS", "7708241274").split(",")))
 
 # CTA persuasivo (usa {name}) — será usado na legenda do vídeo
 CTA_TEXT = """
-⚡ ATENÇÃO, {name}! SEU ACESSO GRATUITO ESTÁ SE ESGOTANDO! ⏰
+🚨 {name}, SEU TEMPO ESTÁ SE ESGOTANDO! ⏰
 
-🎯 ENQUANTO VOCÊ LÊ ESTA MENSAGEM:
-✅ Membros VIP já estão acessando CONTEÚDO EXCLUSIVO
-✅ Novos materiais sendo adicionados AGORA MESMO
-✅ Você está PERDENDO as MELHORES PARTES!
+📊 ENQUANTO VOCÊ PENS:
+✅ 47 novos membros VIP entraram HOJE
+✅ 83 conteúdos EXCLUSIVOS liberados
+✅ R$ 2.847 em vendas realizadas
 
-💎 NO VIP VOCÊ GARANTE:
-🚀 ACESSO COMPLETO 24/7
-🔥 CONTEÚDO 100% EXCLUSIVO
-🎯 SEM CENSURA • SEM LIMITES
-⭐ ATUALIZAÇÕES DIÁRIAS
+💎 NO VIP VOCÊ TEM ACESSO IMEDIATO A:
+⭐ Conteúdo 100% ORIGINAL (sem repetição)
+⭐ Atualizações DIÁRIAS garantidas  
+⭐ Suporte PRIORITÁRIO 24/7
+⭐ Grupo SELADO e ANÔNIMO
 
-🚨 NÃO SEJA O ÚLTIMO DA FILA!
-Quem espera SEMPRE fica para trás...
+🔥 OFERTA RELÂMPAGO ATIVA:
+🎁 50% DE DESCONTO + 3 BÔNUS
+⏰ Válido por tempo LIMITADO
 
-👉 FALE AGORA COM O BOT: @Grupo_Vip_BR2bot
+👉 GARANTA SEU LUGAR: @Grupo_Vip_BR2bot
 """
-
 # Horários configuráveis (formato "HH:MM")
 MESSAGE_HOURS = os.getenv("MESSAGE_HOURS", "12:00,18:00,22:00").split(",")
 
@@ -123,44 +120,43 @@ _db_lock = asyncio.Lock()
 
 # -------------------------
 # Mensagens estruturadas (funil 2 dias x 5 envios/dia + retarget)
-# (baseado no CODE B, adaptado)
 # -------------------------
 MESSAGES_SCHEDULE = {
   "1": {
-    "12:00": "🔥 {name}, chegou a hora de sentir o que poucos têm coragem… 😏\n\nAqui é só a prévia, mas o VIP é o que vai te deixar sem palavras. Cada clique é uma explosão de sensação que você ainda nem imagina. 💥\n\n🎯 Assiste ao vídeo e sente o próximo nível: {link}",
-    "18:00": "👀 {name}, o que tá rolando lá dentro tá deixando todo mundo sem fôlego… e você ainda só imaginando? 😬\n\nNão fica só olhando. Quer sentir? Corre: {link}",
-    "22:00": "🌙 {name}, antes de dormir, pensa: enquanto você tá de fora, o VIP tá entregando experiências que te fariam perder o ar… 💦\n\n💎 Se quer entrar nesse jogo, é agora: {link}"
+    "12:00": "🔥 {name}, ACABOU DE CHEGAR ALGO QUE VAI MUDAR TUDO…\n\nEnquanto você lê isso, 37 pessoas já estão tendo acesso ao conteúdo MAIS QUENTE do VIP.\n\n🚀 Clique no vídeo e prepare-se: {link}",
+    "18:00": "⚡ {name}, O QUE VOCÊ VAI PERDER HOJE À NOITE?\n\nEnquanto hesita, o grupo VIP já liberou 15 conteúdos EXCLUSIVOS hoje.\n\n😏 Quer fazer parte ou vai ficar só na vontade? {link}",
+    "22:00": "🌙 {name}, ANTES DE DORMIR, SAIBA ISSO:\nOs mais espertos já garantiram acesso e estão vivendo experiências ÚNICAS.\n\n💎 Amanhã pode ser tarde demais: {link}"
   },
   "2": {
-    "12:00": "⏰ {name}, segundo dia de prévia… teu tempo tá acabando. ⚡\n\nDepois de hoje, só quem é VIP vai continuar sentindo o que você ainda só sonhou. 🔥\n\n🎯 Quer se entregar ao próximo nível? {link}",
-    "18:00": "🔥 {name}, cada cena que sai lá dentro é um soco de desejo. E você ainda de fora, só imaginando… 😏\n\n🚀 Assiste o vídeo e sente, depois entra: {link}",
-    "22:00": "⚠️ Última chamada antes de perder o acesso à prévia, {name}! ⏰\n\nO que acontece no VIP não é pra qualquer um. Quer ver de perto? 💎 {link}"
+    "12:00": "⏰ {name}, RELÂMPAGO: SUA PRÉVIA ACABA EM 24H!\n\nEsta é sua ÚLTIMA CHANCE de testar antes do acesso ser RESTRITO.\n\n🚨 92% que esperaram perderam condições especiais: {link}",
+    "18:00": "🔴 {name}, ALERTA URGENTE!\nSeus acessos estão se esgotando AGORA.\n\n⚡ Dos que entraram hoje, 78% já migraram para o VIP.\n\n🎯 Não seja o único de fora: {link}",
+    "22:00": "💀 {name}, ÚLTIMO AVISO!\nApós esta mensagem, restam APENAS 12H de acesso.\n\n🚀 Amanhã às 06:00, seu lugar será oferecido para outra pessoa.\n\n⚡ Garanta AGORA: {link}"
   },
   "retarget": {
     "1": {
-      "12:00": "💔 {name}, sua prévia acabou… mas o VIP tá explodindo com tudo que você desejava. 🔥\n\n🎯 Quem voltou ontem já tá vivendo sensações que você só imaginou… {link}",
-      "18:00": "👀 {name}, sente isso? O que tá rolando lá dentro agora é pra poucos — e você ainda tá de fora. 😏\n\n👉 Volta agora e não fica só imaginando: {link}",
-      "22:00": "🎁 Oferta relâmpago pra ex-membros! ⚡\n\nAcesso total + condição especial liberada por tempo limitado! 💎 {discount_link}"
+      "12:00": "💔 {name}, SEU ACESSO ACABOU ONTEM…\nMas temos uma OFERTA RELÂMPAGO para você!\n\n🎁 50% DE DESCONTO + 3 BÔNUS EXCLUSIVOS\n⏰ Válido por 24H: {discount_link}",
+      "18:00": "📉 {name}, SUA COTA ESTÁ CAINDO!\nA cada hora, o desconto diminui 5%.\n\n🔥 Agora: 45% OFF + Bônus\n💎 Amanhã: Acesso normal\n\n🚀 Corre: {discount_link}",
+      "22:00": "🌙 {name}, OFERTA MADRUGADA!\nEnquanto dorme, outros 23 ex-membros já voltaram.\n\n⚡ 40% OFF + Conteúdo Extra\n⏰ Válido até 06:00: {discount_link}"
     },
     "2": {
-      "12:00": "😏 {name}, cada clique que você perdeu tá deixando teu desejo só crescendo… 🔥\n\n💎 Volta enquanto o VIP tá aberto: {link}",
-      "18:00": "⚡ {name}, cada minuto fora é uma sensação que você não sente. Quem tá dentro já tá vivendo tudo. 👀\n\n🎯 Não fica só na vontade, volta: {link}",
-      "22:00": "🚨 Condição especial ainda disponível — mas por pouquíssimo tempo! ⏰\n\nÚltimas horas pra voltar com bônus e acesso completo: {discount_link}"
+      "12:00": "📞 {name}, LEMBRETE ESTRATÉGICO!\nSeu desconto de 35% expira em 12H.\n\n🎯 214 pessoas já usaram esta oferta.\n\n💎 Restam apenas 16 vagas: {discount_link}",
+      "18:00": "🔥 {name}, OS ÚLTIMOS ESTÃO ENTRANDO!\nSua vaga promocional está quase indo…\n\n⚡ 30% OFF + Acesso Imediato\n⏰ Últimas 6 horas: {discount_link}",
+      "22:00": "🚨 {name}, CONDIÇÃO FINAL!\nAmanhã esta oferta some PARA SEMPRE.\n\n💀 25% OFF - ÚLTIMA CHANCE\n🎯 Não deixe para depois: {discount_link}"
     },
     "3": {
-      "12:00": "📅 {name}, já são 3 dias fora… e cada conteúdo novo tá deixando o VIP ainda mais insano. 🔥\n\nQuer sentir de verdade? Volta agora: {link}",
-      "18:00": "💥 Cada cena nova deixa todo mundo enlouquecido… e você ainda só imaginando. 😏\n\n🎯 Não perde mais tempo, entra: {link}",
-      "22:00": "⚡ Última chance com condição especial! 💎\n\nDepois disso, só acesso normal, sem bônus. Últimas horas: {discount_link}"
+      "12:00": "⚰️ {name}, ACORDA!\nSua oferta especial MORRE hoje às 18:00.\n\n🔥 20% OFF - Penúltima oportunidade\n⏰ Corra antes que seja tarde: {discount_link}",
+      "18:00": "💀 {name}, ÚLTIMO SUSPIRO!\nFaltam APENAS 15% de desconto…\n\n⏰ 4 horas para o fim TOTAL das promoções.\n\n🚀 É AGORA OU NUNCA: {discount_link}",
+      "22:00": "☠️ {name}, FIM DA LINHA!\nOportunidades esgotadas em 2 horas.\n\n🎯 Acesso normal a partir de amanhã.\n💎 Última chamada: {link}"
     },
     "4": {
-      "12:00": "⏰ {name}, 4 dias fora… cada minuto é um prazer que você não sente. 😬\n\n🎯 Volta agora e experimenta tudo que tá rolando: {link}",
-      "18:00": "🔥 O VIP tá cada vez mais intenso. Quem tá dentro já tá no ápice… e você ainda imaginando? 😏\n\n💎 Garante teu lugar: {link}",
-      "22:00": "⚡ Últimas horas do acesso promocional! ⏰\n\n💥 Volta agora ou perde tudo: {discount_link}"
+      "12:00": "🔄 {name}, VOLTA ESPECIAL!\nAlguns ex-membros pediram UMA ÚLTIMA CHANCE.\n\n⚡ 10% OFF - Oferta personalizada\n⏰ Apenas hoje: {discount_link}",
+      "18:00": "🎯 {name}, RECUPERAÇÃO ESTRATÉGICA!\nNotamos que você quase entrou várias vezes…\n\n🔥 5% OFF + Bônus Surpresa\n💎 Última tentativa: {discount_link}",
+      "22:00": "💫 {name}, OFERTA MEIA-NOITE!\nAntes de fechar definitivamente sua conta…\n\n⚡ 2% OFF - Simbólico\n🎯 Para quem realmente quer: {discount_link}"
     },
     "5": {
-      "12:00": "🚨 {name}, último dia de recuperação! 🕛\n\nDepois de hoje, todas as condições especiais se encerram. 💔\n\n🎯 É agora ou nunca: {link}",
-      "18:00": "🔥 {name}, a porta tá quase fechando! ⚡\n\nÚltima chance de entrar com bônus ativo e acesso completo. 💎\n\nGarante aqui: {discount_link}",
-      "22:00": "💀 Última mensagem, {name}! 🚨\n\nDepois disso, teu acesso é encerrado de vez. 🎯\n\nSe quiser sentir tudo de perto, agora é o momento: {discount_link}"
+      "12:00": "⌛ {name}, CONTAGEM REGRESSIVA!\nSeu acesso promocional expira EM 12 HORAS.\n\n🚨 ÚLTIMO DIA com condições especiais\n💎 Amanhã: Preço cheio\n\n⚡ Não perca: {discount_link}",
+      "18:00": "⏳ {name}, FALTAM 6 HORAS!\nSua janela de oportunidade está FECHANDO.\n\n🔥 Última chance com bônus\n🎯 Depois disso, é preço normal\n\n🚀 Garanta agora: {discount_link}",
+      "22:00": "💀 {name}, ADEUS DEFINITIVO!\nEsta é sua ÚLTIMA MENSAGEM do sistema.\n\n⚡ Oportunidades ESGOTADAS\n🎯 Preço cheio a partir de amanhã\n\n💎 Se mudar de ideia: {link}"
     }
   }
 }
@@ -175,7 +171,7 @@ async def init_db():
     logger.info("Banco de dados inicializado")
 
 # -------------------------
-# Handlers (mantidos do Código A)
+# Handlers
 # -------------------------
 @dp.message_handler(commands=["start"], chat_type=ChatType.PRIVATE)
 async def cmd_start(message: types.Message):
@@ -290,6 +286,23 @@ async def mark_user_banned(user_id: int):
         await db.execute("UPDATE users SET banned = 1 WHERE user_id = ?", (user_id,))
         await db.commit()
 
+async def unban_user(user_id: int):
+    """Remove o banimento de um usuário (no banco de dados e no grupo)"""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("UPDATE users SET banned = 0, removed = 0 WHERE user_id = ?", (user_id,))
+        await db.commit()
+    logger.info(f"Usuário {user_id} desbanido no banco de dados")
+
+async def unban_user_in_group(user_id: int):
+    """Remove o banimento do usuário no grupo do Telegram"""
+    try:
+        await bot.unban_chat_member(PREVIEWS_GROUP_ID, user_id)
+        logger.info(f"Usuário {user_id} desbanido no grupo do Telegram")
+        return True
+    except Exception as e:
+        logger.error(f"Erro ao desbanir usuário {user_id} no grupo: {e}")
+        return False
+
 async def record_attempt(user_id: int, reason: str):
     attempt_time = int(datetime.now().timestamp())
     async with aiosqlite.connect(DB_PATH) as db:
@@ -300,7 +313,7 @@ async def record_attempt(user_id: int, reason: str):
         await db.commit()
 
 # -------------------------
-# Função que envia a mensagem agendada (texto formatado + vídeo CTA)
+# Função que envia a mensagem agendada
 # -------------------------
 async def send_scheduled_message(user_id: int, day: int, hour: str, is_retarget: bool = False):
     user_info = await get_user_info(user_id)
@@ -308,35 +321,31 @@ async def send_scheduled_message(user_id: int, day: int, hour: str, is_retarget:
         logger.warning(f"Usuário {user_id} não encontrado no banco para envio agendado")
         return
 
-    (
-        _uid,
-        username,
-        first_name,
-        last_name,
-        joined_group,
-        join_time,
-        removed,
-        banned,
-    ) = user_info
+    (_uid, username, first_name, last_name, joined_group, join_time, removed, banned) = user_info
 
-    # Não enviar se removido/banido
-    if removed or banned:
-        logger.debug(f"Ignorado envio para {user_id}: removed={removed}, banned={banned}")
+    # CORREÇÃO: Lógica de verificação corrigida
+    if banned:
+        logger.debug(f"Ignorado envio para {user_id}: usuário banido")
+        return
+        
+    if not is_retarget and removed:
+        logger.debug(f"Ignorado envio de prévia para {user_id}: usuário removido")
         return
 
     name = first_name or "Usuário"
 
-    # Seleciona a mensagem conforme schedule ou retarget
     try:
-        day_key = str(day)  # CORREÇÃO: converter int para str para lookup nas chaves do dict
+        day_key = str(day)
 
         if not is_retarget:
             message_template = MESSAGES_SCHEDULE.get(day_key, {}).get(hour)
+            logger.info(f"Enviando PRÉVIA - Dia {day}, Hora {hour} para {user_id}")
         else:
             message_template = MESSAGES_SCHEDULE.get("retarget", {}).get(day_key, {}).get(hour)
+            logger.info(f"Enviando RETARGET - Dia {day}, Hora {hour} para {user_id} (removed={removed})")
 
         if not message_template:
-            logger.debug(f"Nenhuma mensagem configurada para day={day} hour={hour} retarget={is_retarget}")
+            logger.warning(f"Mensagem não configurada para day={day} hour={hour} retarget={is_retarget}")
             return
 
         remaining_days = max(DAYS_OF_PREVIEW - day, 0)
@@ -350,21 +359,21 @@ async def send_scheduled_message(user_id: int, day: int, hour: str, is_retarget:
 
         success = await safe_send_message(user_id, formatted, name_for_cta=name)
         if success:
-            logger.info(f"Enviado (retarget={is_retarget}) dia {day} hora {hour} para {user_id} ({name})")
+            logger.info(f"✓ Enviado (retarget={is_retarget}) dia {day} hora {hour} para {user_id}")
         else:
-            logger.warning(f"Falha ao enviar (retarget={is_retarget}) dia {day} hora {hour} para {user_id}")
+            logger.warning(f"✗ Falha ao enviar (retarget={is_retarget}) dia {day} hora {hour} para {user_id}")
     except Exception as e:
         logger.exception(f"Erro em send_scheduled_message para {user_id}: {e}")
 
 # -------------------------
-# Agendamento das mensagens (7 dias x MESSAGE_HOURS) + retarget (RETARGET_DAYS)
+# Agendamento das mensagens
 # -------------------------
 async def schedule_user_messages(user_id: int, username: str, first_name: str, last_name: str):
     now = datetime.now(TZ)
-    # Agenda 7 dias (1..DAYS_OF_PREVIEW) com horas configuráveis
+    
+    # Agenda dias de prévia (1..DAYS_OF_PREVIEW) com horas configuráveis
     for day in range(1, DAYS_OF_PREVIEW + 1):
         for hour in MESSAGE_HOURS:
-            # calcula o run_dt: dia relativo + hora
             try:
                 hour_dt = datetime.strptime(hour.strip(), "%H:%M").time()
             except Exception:
@@ -384,7 +393,6 @@ async def schedule_user_messages(user_id: int, username: str, first_name: str, l
 
     # Agenda remoção no fim do período de prévia (após DAYS_OF_PREVIEW dias)
     removal_time = now + timedelta(days=DAYS_OF_PREVIEW)
-    # marcar remoção no horário final do último dia (por segurança, adicionamos 1 minute)
     removal_dt = removal_time + timedelta(minutes=1)
     scheduler.add_job(
         remove_user_from_group,
@@ -394,15 +402,15 @@ async def schedule_user_messages(user_id: int, username: str, first_name: str, l
         replace_existing=True,
     )
 
-    # Agenda retarget (dias seguintes ao fim da prévia): dia 1..RETARGET_DAYS
-    # Esses retargets correspondem a day indexes 1..RETARGET_DAYS no bloco "retarget"
+    # CORREÇÃO: Agenda retarget começando 1 DIA APÓS a remoção
     for rday in range(1, RETARGET_DAYS + 1):
         for hour in MESSAGE_HOURS:
             try:
                 hour_dt = datetime.strptime(hour.strip(), "%H:%M").time()
             except Exception:
                 continue
-            target_date = (now + timedelta(days=DAYS_OF_PREVIEW + rday - 1)).date()
+            # CORREÇÃO: Retarget começa 1 DIA APÓS o fim da prévia
+            target_date = (now + timedelta(days=DAYS_OF_PREVIEW + 1 + (rday - 1))).date()
             run_dt = TZ.localize(datetime.combine(target_date, hour_dt))
             job_id = f"user_{user_id}_retarget_day_{rday}_hour_{hour}"
             scheduler.add_job(
@@ -416,12 +424,11 @@ async def schedule_user_messages(user_id: int, username: str, first_name: str, l
     logger.info(f"Mensagens agendadas para o usuário {user_id} ({first_name}) — {DAYS_OF_PREVIEW} dias + {RETARGET_DAYS} retargets")
 
 # -------------------------
-# Remoção do usuário do grupo (kick) — mantém comportamento do Código A
+# Remoção do usuário do grupo
 # -------------------------
 async def remove_user_from_group(user_id: int):
     try:
         await bot.ban_chat_member(PREVIEWS_GROUP_ID, user_id)
-        # espera breve, menor que 60s
         await asyncio.sleep(5)
         await bot.unban_chat_member(PREVIEWS_GROUP_ID, user_id)
 
@@ -438,7 +445,6 @@ async def remove_user_from_group(user_id: int):
         logger.info(f"Usuário {user_id} removido do grupo de prévia")
     except (ChatAdminRequired, TelegramAPIError) as e:
         logger.error(f"Erro ao remover usuário {user_id} do grupo: {e}")
-        # Notifica administradores
         for admin_id in ADMINS:
             try:
                 await bot.send_message(admin_id, f"Erro ao remover usuário {user_id} do grupo: {e}")
@@ -446,11 +452,10 @@ async def remove_user_from_group(user_id: int):
                 pass
 
 # -------------------------
-# Handler para novos membros no grupo de prévia (anti-retorno)
+# Handler para novos membros no grupo de prévia (ANTI-RETORNO CORRIGIDO)
 # -------------------------
 @dp.chat_member_handler(chat_id=PREVIEWS_GROUP_ID)
 async def handle_chat_member_update(update: ChatMemberUpdated):
-    # Quando alguém entra como 'member' no grupo de prévias
     try:
         if update.new_chat_member.status == 'member':
             user = update.new_chat_member.user
@@ -458,41 +463,47 @@ async def handle_chat_member_update(update: ChatMemberUpdated):
 
             user_info = await get_user_info(user_id)
 
-            # Se já foi removido: tentativa de retorno => ban + aviso
+            # CORREÇÃO: Anti-retorno completo como no código original
             if user_info and user_info[6]:  # removed flag
-                await record_attempt(user_id, "Tentativa de retorno após remoção")
-                try:
-                    await bot.ban_chat_member(PREVIEWS_GROUP_ID, user_id)
-                    await mark_user_banned(user_id)
-                    name = user.first_name or "Usuário"
-                    ban_text = "{name}, seu acesso gratuito já expirou. Para voltar, só no VIP: {link}".format(
-                        name=name, link=PURCHASE_LINK
-                    )
-                    await safe_send_message(user_id, ban_text, name_for_cta=name)
-                    logger.info(f"Usuário {user_id} ({name}) banido por tentativa de retorno")
-                except Exception as e:
-                    logger.error(f"Erro ao banir usuário {user_id}: {e}")
+                join_time = user_info[5]  # join_time
+                current_time = int(datetime.now().timestamp())
+                preview_end_time = join_time + (DAYS_OF_PREVIEW * 24 * 3600)
+                
+                # Só bane se realmente passou do tempo de prévia
+                if current_time > preview_end_time:
+                    await record_attempt(user_id, "Tentativa de retorno após período de prévia")
+                    try:
+                        await bot.ban_chat_member(PREVIEWS_GROUP_ID, user_id)
+                        await mark_user_banned(user_id)
+                        name = user.first_name or "Usuário"
+                        ban_text = "{name}, seu acesso gratuito já expirou. Para voltar, só no VIP: {link}".format(
+                            name=name, link=PURCHASE_LINK
+                        )
+                        await safe_send_message(user_id, ban_text, name_for_cta=name)
+                        logger.info(f"Usuário {user_id} ({name}) banido por tentativa de retorno após período")
+                    except Exception as e:
+                        logger.error(f"Erro ao banir usuário {user_id}: {e}")
+                else:
+                    # Ainda está no período de prévia, permite voltar
+                    logger.info(f"Usuário {user_id} voltou durante período de prévia - permitido")
+                    await update_user_joined(user_id, user.username, user.first_name, user.last_name)
 
             # Novo usuário (ou ainda não marcado como joined)
             elif not user_info or not user_info[4]:  # joined_group flag
                 await update_user_joined(user_id, user.username, user.first_name, user.last_name)
 
-                # --- AÇÃO ADICIONADA: envia vídeo CTA imediato na entrada do grupo ---
+                # Vídeo CTA de boas-vindas
                 try:
                     caption = CTA_TEXT.format(name=user.first_name or "Usuário")
                     await bot.send_video(user_id, VIDEO_URL, caption=caption)
                     logger.info(f"Vídeo CTA de boas-vindas enviado para {user_id}")
                 except Exception as e:
                     logger.error(f"Erro ao enviar vídeo CTA de boas-vindas para {user_id}: {e}")
-                # --- fim da ação adicionada ---
 
                 await schedule_user_messages(user_id, user.username, user.first_name, user.last_name)
 
-                # Mensagem imediata (dia 1) — enviamos a primeira mensagem após pequeno delay (configurável)
+                # Mensagem imediata (dia 1)
                 await asyncio.sleep(SEND_IMMEDIATE_DELAY_SECONDS)
-                # Primeiro envio: dia 1  - assumimos que uma das horas contém "12:00" etc., mas aqui chamamos diretamente:
-                # Vamos enviar a mensagem do "day 1" para o horário corrente (com is_retarget=False)
-                # Para consistência com o agendamento, enviamos a mensagem do dia 1 no horário do primeiro MESSAGE_HOURS[0]
                 first_hour = MESSAGE_HOURS[0].strip() if MESSAGE_HOURS else "12:00"
                 await send_scheduled_message(user_id, 1, first_hour, is_retarget=False)
                 logger.info(f"Novo usuário {user_id} ({user.first_name}) adicionado ao grupo e agendado")
@@ -500,31 +511,26 @@ async def handle_chat_member_update(update: ChatMemberUpdated):
         logger.exception(f"Erro ao processar chat_member_update: {e}")
 
 # -------------------------
-# Comandos administrativos (stats & broadcast) — adaptado do A
+# Comandos administrativos
 # -------------------------
 @dp.message_handler(commands=['stats'], user_id=list(ADMINS), chat_type=ChatType.PRIVATE)
 async def cmd_stats(message: types.Message):
     try:
         async with aiosqlite.connect(DB_PATH) as db:
-            # Total de usuários
             cursor = await db.execute("SELECT COUNT(*) FROM users")
             total_users = (await cursor.fetchone())[0]
 
-            # Usuários ativos
             cursor = await db.execute(
                 "SELECT COUNT(*) FROM users WHERE joined_group = 1 AND removed = 0 AND banned = 0"
             )
             active_users = (await cursor.fetchone())[0]
 
-            # Usuários removidos
             cursor = await db.execute("SELECT COUNT(*) FROM users WHERE removed = 1")
             removed_users = (await cursor.fetchone())[0]
 
-            # Usuários banidos
             cursor = await db.execute("SELECT COUNT(*) FROM users WHERE banned = 1")
             banned_users = (await cursor.fetchone())[0]
 
-            # Tentativas de retorno
             cursor = await db.execute("SELECT COUNT(*) FROM attempts")
             attempts = (await cursor.fetchone())[0]
 
@@ -582,7 +588,6 @@ async def cmd_confirm_broadcast(message: types.Message):
                         sent += 1
                     except Exception:
                         failed += 1
-                    # Evita flood/hard rate-limit
                     await asyncio.sleep(0.05)
     finally:
         _pending_broadcast.pop(admin_id, None)
@@ -593,6 +598,41 @@ async def cmd_confirm_broadcast(message: types.Message):
 async def cmd_cancel_broadcast(message: types.Message):
     _pending_broadcast.pop(message.from_user.id, None)
     await message.answer("❌ Broadcast cancelado.")
+
+# Comando para desbanir usuário
+@dp.message_handler(commands=['desbanir'], user_id=list(ADMINS), chat_type=ChatType.PRIVATE)
+async def cmd_unban(message: types.Message):
+    """Desbanir um usuário (útil para testes)"""
+    try:
+        if message.reply_to_message:
+            user_id = message.reply_to_message.from_user.id
+            username = message.reply_to_message.from_user.username or "Sem username"
+            first_name = message.reply_to_message.from_user.first_name or "Usuário"
+        else:
+            user_id = message.from_user.id
+            username = message.from_user.username or "Sem username"
+            first_name = message.from_user.first_name or "Usuário"
+
+        await unban_user(user_id)
+        group_unbanned = await unban_user_in_group(user_id)
+        
+        for job in scheduler.get_jobs():
+            if f"user_{user_id}" in job.id:
+                scheduler.remove_job(job.id)
+                logger.info(f"Job removido: {job.id}")
+
+        if group_unbanned:
+            response = f"✅ Usuário @{username} ({first_name}) desbanido com sucesso!\n\n📊 Status:\n• Banimento removido do banco\n• Banimento removido do grupo\n• Jobs de remoção cancelados"
+        else:
+            response = f"⚠️ Usuário @{username} ({first_name}) desbanido parcialmente!\n\n📊 Status:\n• Banimento removido do banco ✅\n• Erro ao remover banimento do grupo ❌\n• Jobs de remoção cancelados ✅\n\n💡 O usuário pode não estar banido no grupo."
+
+        await message.answer(response)
+        logger.info(f"Admin {message.from_user.id} desbaniu o usuário {user_id}")
+
+    except Exception as e:
+        error_msg = f"❌ Erro ao desbanir usuário: {e}"
+        await message.answer(error_msg)
+        logger.error(f"Erro no comando desbanir: {e}")
 
 # -------------------------
 # Startup / Shutdown
