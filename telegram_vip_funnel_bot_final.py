@@ -57,10 +57,11 @@ ADMINS = set(map(int, os.getenv("ADMINS", "7708241274").split(",")))
 CTA_TEXT = """
 🚨 {name}, SEU TEMPO ESTÁ SE ESGOTANDO! ⏰
 
-📊 ENQUANTO VOCÊ PENS:
-✅ 47 novos membros VIP entraram HOJE
-✅ 83 conteúdos EXCLUSIVOS liberados
-✅ R$ 2.847 em vendas realizadas
+🚨 NO VIP VOCÊ VERIA AGORA:
+✅ Cena COMPLETA sem cortes
+✅ Ângulos EXCLUSIVOS  
+✅ Conteúdo 100% SEM CENSURA
+✅ OnlyFans VAZADOS HOJE
 
 💎 NO VIP VOCÊ TEM ACESSO IMEDIATO A:
 ⭐ Conteúdo 100% ORIGINAL (sem repetição)
@@ -68,9 +69,9 @@ CTA_TEXT = """
 ⭐ Suporte PRIORITÁRIO 24/7
 ⭐ Grupo SELADO e ANÔNIMO
 
-🔥 OFERTA RELÂMPAGO ATIVA:
-🎁 50% DE DESCONTO + 3 BÔNUS
-⏰ Válido por tempo LIMITADO
+📊 ENQUANTO VOCÊ ASSISTE:
+⭐ 47 pessoas entraram no VIP
+⭐ 83 conteúdos NOVOS
 
 👉 GARANTA SEU LUGAR: @Grupo_Vip_BR2bot
 """
@@ -123,40 +124,40 @@ _db_lock = asyncio.Lock()
 # -------------------------
 MESSAGES_SCHEDULE = {
   "1": {
-    "12:00": "🔥 {name}, ACABOU DE CHEGAR ALGO QUE VAI MUDAR TUDO…\n\nEnquanto você lê isso, 37 pessoas já estão tendo acesso ao conteúdo MAIS QUENTE do VIP.\n\n🚀 Clique no vídeo e prepare-se: {link}",
-    "18:00": "⚡ {name}, O QUE VOCÊ VAI PERDER HOJE À NOITE?\n\nEnquanto hesita, o grupo VIP já liberou 15 conteúdos EXCLUSIVOS hoje.\n\n😏 Quer fazer parte ou vai ficar só na vontade? {link}",
-    "22:00": "🌙 {name}, ANTES DE DORMIR, SAIBA ISSO:\nOs mais espertos já garantiram acesso e estão vivendo experiências ÚNICAS.\n\n💎 Amanhã pode ser tarde demais: {link}"
+    "12:00": "🚨 {name}, SEU ACESSO À PRÉVIA COMEÇOU!\n\n⚠️ ATENÇÃO: Você tem 48h para aproveitar conteúdo GRATUITO antes do banimento automático!\n\n🔥 Enquanto isso, no VIP: +15 cenas EXCLUSIVAS por dia\n💎 Clique e veja o que te espera: {link}",
+    "18:00": "😈 {name}, AS MELHORES CENAS ESTÃO NO VIP!\n\nEnquanto você vê amostras aqui, lá estão liberando:\n• Cenas COMPLETAS sem censura\n• Conteúdo INÉDITO todo dia\n• OnlyFans vazados\n• Close Friends exclusivos\n\n⚡ Não fique só na vontade: {link}",
+    "22:00": "🌙 {name}, HOJE 23 PESSAS SAÍRAM DA PRÉVIA PRO VIP!\n\nElas cansaram de ver migalhas e foram atrás do BANQUETE completo!\n\n🚀 Sua vez amanhã? {link}"
   },
   "2": {
-    "12:00": "⏰ {name}, RELÂMPAGO: SUA PRÉVIA ACABA EM 24H!\n\nEsta é sua ÚLTIMA CHANCE de testar antes do acesso ser RESTRITO.\n\n🚨 92% que esperaram perderam condições especiais: {link}",
-    "18:00": "🔴 {name}, ALERTA URGENTE!\nSeus acessos estão se esgotando AGORA.\n\n⚡ Dos que entraram hoje, 78% já migraram para o VIP.\n\n🎯 Não seja o único de fora: {link}",
-    "22:00": "💀 {name}, ÚLTIMO AVISO!\nApós esta mensagem, restam APENAS 12H de acesso.\n\n🚀 Amanhã às 06:00, seu lugar será oferecido para outra pessoa.\n\n⚡ Garanta AGORA: {link}"
+    "10:00": "⏰ {name}, FALTAM 12H PARA SEU BANIMENTO!\n\nSeu acesso à prévia expira HOJE às 22:00!\n\n🔞 No VIP você teria acesso agora a:\n✅ +500 cenas COMPLETAS\n✅ +50 onlyfans vazados\n✅ Conteúdo DIÁRIO\n\n💀 Vai perder essa chance? {link}",
+    "16:00": "🚨 {name}, ALERTA VERMELHO: 6H RESTANTES!\n\nSeu banimento da prévia está CHEGANDO!\n\n🔥 Última chance de migrar pro VIP com:\n• Acesso VITALÍCIO\n• Conteúdo SEM CENSURA\n• Atualizações DIÁRIAS\n\n⚡ Corre antes que seja tarde: {link}",
+    "21:00": "💀 {name}, ÚLTIMA HORA NA PRÉVIA!\n\nFALTAM 60 MINUTOS para seu BANIMENTO!\n\n🎯 Das 47 pessoas banidas hoje, 41 entraram no VIP!\n\n🚀 Última oportunidade: {link}"
   },
   "retarget": {
     "1": {
-      "12:00": "💔 {name}, SEU ACESSO ACABOU ONTEM…\nMas temos uma OFERTA RELÂMPAGO para você!\n\n🎁 50% DE DESCONTO + 3 BÔNUS EXCLUSIVOS\n⏰ Válido por 24H: {discount_link}",
-      "18:00": "📉 {name}, SUA COTA ESTÁ CAINDO!\nA cada hora, o desconto diminui 5%.\n\n🔥 Agora: 45% OFF + Bônus\n💎 Amanhã: Acesso normal\n\n🚀 Corre: {discount_link}",
-      "22:00": "🌙 {name}, OFERTA MADRUGADA!\nEnquanto dorme, outros 23 ex-membros já voltaram.\n\n⚡ 40% OFF + Conteúdo Extra\n⏰ Válido até 06:00: {discount_link}"
+      "12:00": "💔 {name}, VOCÊ FOI BANIDO DA PRÉVIA...\n\nMas sua JORNADA ATUDO não precisa acabar aqui!\n\n🔞 No VIP você teria acesso AGORA a:\n• Cenas COMPLETAS que não viu\n• OnlyFans EXCLUSIVOS\n• Conteúdo 100% SEM CENSURA\n\n⚡ Volte agora: {link}",
+      "18:00": "😈 {name, SENTIU FALTA DAS CENAS QUENTES?\n\nEnquanto você foi banido, o VIP liberou +8 cenas NOVAS!\n\n🔥 Conteúdo que você NÃO ENCONTRA em outro lugar!\n💎 Acesso imediato: {link}",
+      "22:00": "🌙 {name}, AS CENAS MAIS PICANTES CONTINUAM NO VIP!\n\n23 ex-banidos já retornaram e estão gozando com conteúdo premium!\n\n🚀 Sua vez? {link}"
     },
     "2": {
-      "12:00": "📞 {name}, LEMBRETE ESTRATÉGICO!\nSeu desconto de 35% expira em 12H.\n\n🎯 214 pessoas já usaram esta oferta.\n\n💎 Restam apenas 16 vagas: {discount_link}",
-      "18:00": "🔥 {name}, OS ÚLTIMOS ESTÃO ENTRANDO!\nSua vaga promocional está quase indo…\n\n⚡ 30% OFF + Acesso Imediato\n⏰ Últimas 6 horas: {discount_link}",
-      "22:00": "🚨 {name}, CONDIÇÃO FINAL!\nAmanhã esta oferta some PARA SEMPRE.\n\n💀 25% OFF - ÚLTIMA CHANCE\n🎯 Não deixe para depois: {discount_link}"
+      "12:00": "🚨 {name}, ALERTA: CONTEÚDO NOVO DISPONÍVEL!\n\nEnquanto você está fora, o VIP está bombando:\n• OnlyFans vazados HOJE\n• Close Friends EXCLUSIVOS\n• Cenas COMPLETAS sem cortes\n\n⚡ Não fique de fora: {link}",
+      "18:00": "😈 {name, AS COISAS ESQUENTARAM NO VIP!\n\nLiberamos conteúdo EXCLUSIVO que vai te fazer perder a cabeça!\n\n🔥 Cenas que você nunca viu antes!\n💎 Acesso imediato: {link}",
+      "22:00": "💀 {name}, ÚLTIMO CONVITE ESPECIAL!\n\nReabrimos vagas por TEMPO LIMITADO!\n\n🎯 Condições especiais para ex-membros da prévia!\n⚡ Entre agora: {link}"
     },
     "3": {
-      "12:00": "⚰️ {name}, ACORDA!\nSua oferta especial MORRE hoje às 18:00.\n\n🔥 20% OFF - Penúltima oportunidade\n⏰ Corra antes que seja tarde: {discount_link}",
-      "18:00": "💀 {name}, ÚLTIMO SUSPIRO!\nFaltam APENAS 15% de desconto…\n\n⏰ 4 horas para o fim TOTAL das promoções.\n\n🚀 É AGORA OU NUNCA: {discount_link}",
-      "22:00": "☠️ {name}, FIM DA LINHA!\nOportunidades esgotadas em 2 horas.\n\n🎯 Acesso normal a partir de amanhã.\n💎 Última chamada: {link}"
+      "12:00": "⚡ {name}, ACORDA PRO PERIGO!\n\nO conteúdo mais OUSADO está rolando no VIP!\n\n🔞 Cenas PROIBIDAS\n🔞 OnlyFans VAZADOS\n🔞 Close Friends ÍNTIMOS\n\n🚀 Você tem coragem? {link}",
+      "18:00": "😈 {name, HOJE TEM CENA EXPLÍCITA NO VIP!\n\nMaterial tão quente que quase derreteu o servidor!\n\n🔥 Apenas para membros CORAJOSOS!\n💎 Topa o desafio? {link}",
+      "22:00": "🌙 {name}, MADRUGADA DE PRAZER NO VIP!\n\nEnquanto você dorme, o grupo está ativo com conteúdo PICANTE!\n\n🚀 Última chance hoje: {link}"
     },
     "4": {
-      "12:00": "🔄 {name}, VOLTA ESPECIAL!\nAlguns ex-membros pediram UMA ÚLTIMA CHANCE.\n\n⚡ 10% OFF - Oferta personalizada\n⏰ Apenas hoje: {discount_link}",
-      "18:00": "🎯 {name}, RECUPERAÇÃO ESTRATÉGICA!\nNotamos que você quase entrou várias vezes…\n\n🔥 5% OFF + Bônus Surpresa\n💎 Última tentativa: {discount_link}",
-      "22:00": "💫 {name}, OFERTA MEIA-NOITE!\nAntes de fechar definitivamente sua conta…\n\n⚡ 2% OFF - Simbólico\n🎯 Para quem realmente quer: {discount_link}"
+      "12:00": "🎯 {name, OFERTA RELÂMPAGO!\n\nApenas HOJE: Bônus EXCLUSIVO para quem voltar!\n\n🔞 Pacote de cenas INÉDITAS\n🔞 OnlyFans nunca vazados\n🔞 Conteúdo EXTRA quente\n\n⚡ Por tempo limitado: {link}",
+      "18:00": "🚨 {name, VAGAS QUASE ESGOTADAS!\n\nSó restam 8 vagas com bônus especial!\n\n🔥 Conteúdo que vai te deixar viciado!\n💎 Garanta já: {link}",
+      "22:00": "💀 {name, ÚLTIMA OPORTUNIDADE COM BÔNUS!\n\nFaltam 2 horas para o bônus expirar!\n\n⚡ Não deixe para depois: {link}"
     },
     "5": {
-      "12:00": "⌛ {name}, CONTAGEM REGRESSIVA!\nSeu acesso promocional expira EM 12 HORAS.\n\n🚨 ÚLTIMO DIA com condições especiais\n💎 Amanhã: Preço cheio\n\n⚡ Não perca: {discount_link}",
-      "18:00": "⏳ {name}, FALTAM 6 HORAS!\nSua janela de oportunidade está FECHANDO.\n\n🔥 Última chance com bônus\n🎯 Depois disso, é preço normal\n\n🚀 Garanta agora: {discount_link}",
-      "22:00": "💀 {name}, ADEUS DEFINITIVO!\nEsta é sua ÚLTIMA MENSAGEM do sistema.\n\n⚡ Oportunidades ESGOTADAS\n🎯 Preço cheio a partir de amanhã\n\n💎 Se mudar de ideia: {link}"
+      "12:00": "⌛ {name, CONTAGEM REGRESSIVA FINAL!\n\nÚLTIMO DIA com condições especiais!\n\n🔞 Amanhã o preço sobe 50%\n🔞 Bônus expiram hoje\n\n🚀 Não seja o único a perder: {link}",
+      "18:00": "⏳ {name, FALTAM 6H PARA MUDANÇAS!\n\nO VIP nunca mais será tão acessível!\n\n🔥 Última chance com preço atual\n💎 Amanhã será tarde: {link}",
+      "22:00": "💀 {name, ADEUS DEFINITIVO!\n\nEsta é sua ÚLTIMA mensagem do sistema!\n\n⚡ Oportunidades se esgotam em 2h\n🎯 Preço sobe AMANHÃ\n\n🔞 Última chamada: {link}"
     }
   }
 }
