@@ -55,25 +55,25 @@ ADMINS = set(map(int, os.getenv("ADMINS", "7708241274").split(",")))
 
 # CTA persuasivo (usa {name}) — será usado na legenda do vídeo
 CTA_TEXT = """
-🚨 {name}, SEU TEMPO ESTÁ SE ESGOTANDO! ⏰
+🚨 {name}, SEU TEMPO ESTÁ ACABANDO! ⏰
 
 🚨 NO VIP VOCÊ VERIA AGORA:
-✅ Cena COMPLETA sem cortes
-✅ Ângulos EXCLUSIVOS  
+✅ Cenas COMPLETAS sem cortes
+✅ Ângulos EXCLUSIVOS
 ✅ Conteúdo 100% SEM CENSURA
-✅ OnlyFans VAZADOS HOJE
+✅ OnlyFans vazado HOJE
 
 💎 NO VIP VOCÊ TEM ACESSO IMEDIATO A:
-⭐ Conteúdo 100% ORIGINAL (sem repetição)
-⭐ Atualizações DIÁRIAS garantidas  
-⭐ Suporte PRIORITÁRIO 24/7
-⭐ Grupo SELADO e ANÔNIMO
+⭐ Conteúdo 100% ORIGINAL (nada repetido)
+⭐ Atualizações DIÁRIAS garantidas
+⭐ Suporte prioritário 24h
+⭐ Grupo sigiloso e anônimo
 
-📊 ENQUANTO VOCÊ ASSISTE:
+📊 ENQUANTO VOCÊ VÊ PRÉVIA:
 ⭐ 47 pessoas entraram no VIP
-⭐ 83 conteúdos NOVOS
+⭐ 83 novos conteúdos postados
 
-👉 GARANTA SEU LUGAR: @Grupo_Vip_BR2bot
+👉 GARANTA SUA VAGA: {link}
 """
 # Horários configuráveis (formato "HH:MM")
 MESSAGE_HOURS = os.getenv("MESSAGE_HOURS", "12:00,18:00,22:00").split(",")
@@ -124,44 +124,43 @@ _db_lock = asyncio.Lock()
 # -------------------------
 MESSAGES_SCHEDULE = {
   "1": {
-    "12:00": "🚨 {name}, SEU ACESSO À PRÉVIA COMEÇOU!\n\n⚠️ ATENÇÃO: Você tem 48h para aproveitar conteúdo GRATUITO antes do banimento automático!\n\n🔥 Enquanto isso, no VIP: +15 cenas EXCLUSIVAS por dia\n💎 Clique e veja o que te espera: {link}",
-    "18:00": "😈 {name}, AS MELHORES CENAS ESTÃO NO VIP!\n\nEnquanto você vê amostras aqui, lá estão liberando:\n• Cenas COMPLETAS sem censura\n• Conteúdo INÉDITO todo dia\n• OnlyFans vazados\n• Close Friends exclusivos\n\n⚡ Não fique só na vontade: {link}",
-    "22:00": "🌙 {name}, HOJE 23 PESSAS SAÍRAM DA PRÉVIA PRO VIP!\n\nElas cansaram de ver migalhas e foram atrás do BANQUETE completo!\n\n🚀 Sua vez amanhã? {link}"
+    "12:00": "🚨 {name}, YOUR PREVIEW ACCESS HAS STARTED!\n\n⚠️ ATTENTION: You have 48h to enjoy FREE content before automatic ban!\n\n🔥 Meanwhile in VIP: +15 EXCLUSIVE scenes daily\n💎 Click to see what awaits you: {link}",
+    "18:00": "😈 {name}, THE HOTTEST SCENES ARE IN VIP!\n\nWhile you see samples here, they're releasing:\n• FULL scenes without censorship\n• NEVER-BEFORE-SEEN content daily\n• Leaked OnlyFans\n• Exclusive Close Friends\n\n⚡ Don't just settle for previews: {link}",
+    "22:00": "🌙 {name}, TODAY 23 PEOPLE UPGRADED FROM PREVIEW TO VIP!\n\nThey got tired of crumbs and went for the FULL FEAST!\n\n🚀 Your turn tomorrow? {link}"
   },
   "2": {
-    "10:00": "⏰ {name}, FALTAM 12H PARA SEU BANIMENTO!\n\nSeu acesso à prévia expira HOJE às 22:00!\n\n🔞 No VIP você teria acesso agora a:\n✅ +500 cenas COMPLETAS\n✅ +50 onlyfans vazados\n✅ Conteúdo DIÁRIO\n\n💀 Vai perder essa chance? {link}",
-    "16:00": "🚨 {name}, ALERTA VERMELHO: 6H RESTANTES!\n\nSeu banimento da prévia está CHEGANDO!\n\n🔥 Última chance de migrar pro VIP com:\n• Acesso VITALÍCIO\n• Conteúdo SEM CENSURA\n• Atualizações DIÁRIAS\n\n⚡ Corre antes que seja tarde: {link}",
-    "21:00": "💀 {name}, ÚLTIMA HORA NA PRÉVIA!\n\nFALTAM 60 MINUTOS para seu BANIMENTO!\n\n🎯 Das 47 pessoas banidas hoje, 41 entraram no VIP!\n\n🚀 Última oportunidade: {link}"
+    "12:00": "⏰ {name}, 12H LEFT UNTIL YOUR BAN!\n\nYour preview access expires TODAY at 22:00!\n\n🔞 In VIP you'd have access right now to:\n✅ +500 COMPLETE scenes\n✅ +50 leaked onlyfans\n✅ DAILY content\n\n💀 Gonna miss this chance? {link}",
+    "18:00": "🚨 {name}, RED ALERT: 6H REMAINING!\n\nYour preview ban is APPROACHING!\n\n🔥 Last chance to upgrade to VIP with:\n• LIFETIME access\n• UNCENSORED content\n• DAILY updates\n\n⚡ Run before it's too late: {link}",
+    "22:00": "💀 {name}, FINAL HOUR IN PREVIEW!\n\nONLY 60 MINUTES left until your BAN!\n\n🎯 Out of 47 people banned today, 41 joined VIP!\n\n🚀 Final opportunity: {link}"
   },
   "retarget": {
     "1": {
-      "12:00": "💔 {name}, VOCÊ FOI BANIDO DA PRÉVIA...\n\nMas sua JORNADA ATUDO não precisa acabar aqui!\n\n🔞 No VIP você teria acesso AGORA a:\n• Cenas COMPLETAS que não viu\n• OnlyFans EXCLUSIVOS\n• Conteúdo 100% SEM CENSURA\n\n⚡ Volte agora: {link}",
-      "18:00": "😈 {name, SENTIU FALTA DAS CENAS QUENTES?\n\nEnquanto você foi banido, o VIP liberou +8 cenas NOVAS!\n\n🔥 Conteúdo que você NÃO ENCONTRA em outro lugar!\n💎 Acesso imediato: {link}",
-      "22:00": "🌙 {name}, AS CENAS MAIS PICANTES CONTINUAM NO VIP!\n\n23 ex-banidos já retornaram e estão gozando com conteúdo premium!\n\n🚀 Sua vez? {link}"
+      "12:00": "💔 {name}, YOU WERE BANNED FROM PREVIEW...\n\nBut your ADULT journey doesn't have to end here!\n\n🔞 In VIP you'd have access RIGHT NOW to:\n• COMPLETE scenes you missed\n• EXCLUSIVE OnlyFans\n• 100% UNCENSORED content\n\n⚡ Come back now: {link}",
+      "18:00": "😈 {name}, MISSING THE HOT SCENES?\n\nWhile you were banned, VIP released +8 NEW scenes!\n\n🔥 Content you WON'T FIND anywhere else!\n💎 Immediate access: {link}",
+      "22:00": "🌙 {name}, THE SPICIEST SCENES CONTINUE IN VIP!\n\n23 ex-banned members returned and are enjoying premium content!\n\n🚀 Your turn? {link}"
     },
     "2": {
-      "12:00": "🚨 {name}, ALERTA: CONTEÚDO NOVO DISPONÍVEL!\n\nEnquanto você está fora, o VIP está bombando:\n• OnlyFans vazados HOJE\n• Close Friends EXCLUSIVOS\n• Cenas COMPLETAS sem cortes\n\n⚡ Não fique de fora: {link}",
-      "18:00": "😈 {name, AS COISAS ESQUENTARAM NO VIP!\n\nLiberamos conteúdo EXCLUSIVO que vai te fazer perder a cabeça!\n\n🔥 Cenas que você nunca viu antes!\n💎 Acesso imediato: {link}",
-      "22:00": "💀 {name}, ÚLTIMO CONVITE ESPECIAL!\n\nReabrimos vagas por TEMPO LIMITADO!\n\n🎯 Condições especiais para ex-membros da prévia!\n⚡ Entre agora: {link}"
+      "12:00": "🚨 {name}, ALERT: NEW CONTENT AVAILABLE!\n\nWhile you're out, VIP is blowing up with:\n• OnlyFans leaked TODAY\n• EXCLUSIVE Close Friends\n• FULL scenes without cuts\n\n⚡ Don't stay out: {link}",
+      "18:00": "😈 {name}, THINGS HEATED UP IN VIP!\n\nWe released EXCLUSIVE content that will blow your mind!\n\n🔥 Scenes you've never seen before!\n💎 Immediate access: {link}",
+      "22:00": "💀 {name}, FINAL SPECIAL INVITATION!\n\nWe reopened spots for LIMITED TIME!\n\n🎯 Special conditions for ex-preview members!\n⚡ Join now: {link}"
     },
     "3": {
-      "12:00": "⚡ {name}, ACORDA PRO PERIGO!\n\nO conteúdo mais OUSADO está rolando no VIP!\n\n🔞 Cenas PROIBIDAS\n🔞 OnlyFans VAZADOS\n🔞 Close Friends ÍNTIMOS\n\n🚀 Você tem coragem? {link}",
-      "18:00": "😈 {name, HOJE TEM CENA EXPLÍCITA NO VIP!\n\nMaterial tão quente que quase derreteu o servidor!\n\n🔥 Apenas para membros CORAJOSOS!\n💎 Topa o desafio? {link}",
-      "22:00": "🌙 {name}, MADRUGADA DE PRAZER NO VIP!\n\nEnquanto você dorme, o grupo está ativo com conteúdo PICANTE!\n\n🚀 Última chance hoje: {link}"
+      "12:00": "⚡ {name}, WAKE UP TO THE DANGER!\n\nThe most DARING content is happening in VIP!\n\n🔞 FORBIDDEN scenes\n🔞 LEAKED OnlyFans\n🔞 INTIMATE Close Friends\n\n🚀 Do you have the courage? {link}",
+      "18:00": "😈 {name}, TODAY HAS EXPLICIT SCENES IN VIP!\n\nMaterial so hot it almost melted the server!\n\n🔥 Only for BRAVE members!\n💎 Up for the challenge? {link}",
+      "22:00": "🌙 {name}, PLEASURE ALL NIGHT IN VIP!\n\nWhile you sleep, the group is active with SPICY content!\n\n🚀 Last chance today: {link}"
     },
     "4": {
-      "12:00": "🎯 {name, OFERTA RELÂMPAGO!\n\nApenas HOJE: Bônus EXCLUSIVO para quem voltar!\n\n🔞 Pacote de cenas INÉDITAS\n🔞 OnlyFans nunca vazados\n🔞 Conteúdo EXTRA quente\n\n⚡ Por tempo limitado: {link}",
-      "18:00": "🚨 {name, VAGAS QUASE ESGOTADAS!\n\nSó restam 8 vagas com bônus especial!\n\n🔥 Conteúdo que vai te deixar viciado!\n💎 Garanta já: {link}",
-      "22:00": "💀 {name, ÚLTIMA OPORTUNIDADE COM BÔNUS!\n\nFaltam 2 horas para o bônus expirar!\n\n⚡ Não deixe para depois: {link}"
+      "12:00": "🎯 {name}, FLASH OFFER!\n\nOnly TODAY: EXCLUSIVE bonus for returning!\n\n🔞 Package of UNSEEN scenes\n🔞 Never-before-leaked OnlyFans\n🔞 EXTRA hot content\n\n⚡ For limited time: {link}",
+      "18:00": "🚨 {name}, SPOTS ALMOST GONE!\n\nOnly 8 spots left with special bonus!\n\n🔥 Content that will get you addicted!\n💎 Secure yours: {link}",
+      "22:00": "💀 {name}, LAST OPPORTUNITY WITH BONUS!\n\nOnly 2 hours left until bonus expires!\n\n⚡ Don't leave it for later: {link}"
     },
     "5": {
-      "12:00": "⌛ {name, CONTAGEM REGRESSIVA FINAL!\n\nÚLTIMO DIA com condições especiais!\n\n🔞 Amanhã o preço sobe 50%\n🔞 Bônus expiram hoje\n\n🚀 Não seja o único a perder: {link}",
-      "18:00": "⏳ {name, FALTAM 6H PARA MUDANÇAS!\n\nO VIP nunca mais será tão acessível!\n\n🔥 Última chance com preço atual\n💎 Amanhã será tarde: {link}",
-      "22:00": "💀 {name, ADEUS DEFINITIVO!\n\nEsta é sua ÚLTIMA mensagem do sistema!\n\n⚡ Oportunidades se esgotam em 2h\n🎯 Preço sobe AMANHÃ\n\n🔞 Última chamada: {link}"
+      "12:00": "⌛ {name}, FINAL COUNTDOWN!\n\nLAST DAY with special conditions!\n\n🔞 Price increases 50% tomorrow\n🔞 Bonuses expire today\n\n🚀 Don't be the one to miss out: {link}",
+      "18:00": "⏳ {name}, 6H LEFT UNTIL CHANGES!\n\nVIP will never be this affordable again!\n\n🔥 Last chance at current price\n💎 Tomorrow will be too late: {link}",
+      "22:00": "💀 {name}, FINAL GOODBYE!\n\nThis is your LAST system message!\n\n⚡ Opportunities end in 2h\n🎯 Price increases TOMORROW\n\n🔞 Last call: {link}"
     }
   }
 }
-
 # -------------------------
 # Inicialização do banco de dados
 # -------------------------
@@ -196,19 +195,19 @@ async def cmd_start(message: types.Message):
             )
             await db.commit()
 
-        start_text = """🎯 ACESSO LIBERADO - GRUPO PRÉVIAS 🎯
+        start_text = """🎯 ACESSO GRATUITO - GRUPO DE PRÉVIA 🎯
 
 ✅ Seu acesso temporário foi ativado com sucesso!
 
-🔗 Entre agora no grupo:
-{invite_link}
+🔗 Entre no grupo agora: {invite_link}
 
 🚨 Informações importantes:
 • Duração: {days} dias gratuitos
 • Sistema anti-retorno ativo (não tente voltar sem pagar)
-• O VIP oferece benefícios completos
+• O VIP desbloqueia todos os benefícios
 
-👉 Dica: Entre AGORA mesmo e não perca nenhum conteúdo!""".format(
+👉 Dica: Entre AGORA e não perca nada!
+""".format(
     invite_link=PREVIEWS_GROUP_INVITE_LINK,
     days=DAYS_OF_PREVIEW
 )
@@ -223,30 +222,46 @@ async def cmd_start(message: types.Message):
 # Funções auxiliares (DB + envio)
 # -------------------------
 async def safe_send_message(chat_id: int, text: str, name_for_cta: str, max_retries: int = MAX_MESSAGE_RETRIES) -> bool:
-    """Envia texto + vídeo com CTA, respeitando limites e re-tentativas."""
-    attempt = 0
-    while attempt < max_retries:
-        try:
-            if text:
+    """Envia texto + vídeo com CTA - Garante que o vídeo seja enviado."""
+    video_sent = False
+    text_sent = False
+    
+    # PRIMEIRO: Tenta enviar o vídeo (mais importante)
+    try:
+        caption = CTA_TEXT.format(name=name_for_cta, link=PURCHASE_LINK)  # ← ADICIONE ISSO!
+        await bot.send_video(chat_id, VIDEO_URL, caption=caption)
+        video_sent = True
+        logger.info(f"✅ Vídeo CTA enviado para {chat_id}")
+    except Exception as e:
+        logger.error(f"❌ Falha CRÍTICA: Não foi possível enviar vídeo para {chat_id}: {e}")
+        return False  # Se o vídeo falha, retorna erro
+    
+    # SEGUNDO: Tenta enviar o texto (opcional)
+    if text:
+        attempt = 0
+        while attempt < max_retries:
+            try:
                 await bot.send_message(chat_id, text)
-            # Envia o vídeo com legenda personalizada (CTA)
-            caption = CTA_TEXT.format(name=name_for_cta)
-            await bot.send_video(chat_id, VIDEO_URL, caption=caption)
-            return True
-        except RetryAfter as e:
-            wait = getattr(e, 'timeout', getattr(e, 'retry_after', None)) or 5
-            logger.info(f"RetryAfter: aguardando {wait}s antes de tentar novamente para {chat_id}")
-            await asyncio.sleep(wait)
-            attempt += 1
-        except (BotBlocked, ChatNotFound, UserDeactivated, Unauthorized):
-            logger.warning(f"Não foi possível enviar mensagem para {chat_id} (usuário bloqueou/desativado).")
-            return False
-        except Exception as e:
-            logger.warning(f"Falha ao enviar mensagem para {chat_id} (tentativa {attempt+1}): {e}")
-            attempt += 1
-            await asyncio.sleep(2)
-    logger.error(f"Falha permanente ao enviar mensagem para {chat_id} após {max_retries} tentativas.")
-    return False
+                text_sent = True
+                logger.info(f"✅ Mensagem de texto enviada para {chat_id}")
+                break
+            except RetryAfter as e:
+                wait = getattr(e, 'timeout', getattr(e, 'retry_after', None)) or 5
+                logger.info(f"RetryAfter: aguardando {wait}s para texto em {chat_id}")
+                await asyncio.sleep(wait)
+                attempt += 1
+            except (BotBlocked, ChatNotFound, UserDeactivated, Unauthorized):
+                logger.warning(f"Usuário {chat_id} bloqueou o bot - texto não enviado")
+                break
+            except Exception as e:
+                logger.warning(f"Falha no texto para {chat_id} (tentativa {attempt+1}): {e}")
+                attempt += 1
+                await asyncio.sleep(2)
+        
+        if not text_sent:
+            logger.warning(f"⚠️ Texto não enviado para {chat_id}, mas vídeo foi enviado")
+    
+    return video_sent  # Retorna True se pelo menos o vídeo foi enviado
 
 async def get_user_info(user_id: int):
     async with aiosqlite.connect(DB_PATH) as db:
@@ -438,10 +453,10 @@ async def remove_user_from_group(user_id: int):
         user_info = await get_user_info(user_id)
         if user_info:
             name = user_info[2] or "Usuário"
-            removal_text = "Seu acesso ao grupo de prévia acabou, {name} ❌\n\nEntre no VIP para continuar: {link}".format(
+            removal_text = "{name}, seu acesso gratuito expirou. Para voltar, somente entrando no VIP: {link}".format(
                 name=name, link=PURCHASE_LINK
             )
-            await safe_send_message(user_id, removal_text, name_for_cta=name)
+            await safe_send_message(user_id, removal_text, name_for_cta=name)  # ← CORRIGIDO!
 
         logger.info(f"Usuário {user_id} removido do grupo de prévia")
     except (ChatAdminRequired, TelegramAPIError) as e:
@@ -451,7 +466,7 @@ async def remove_user_from_group(user_id: int):
                 await bot.send_message(admin_id, f"Erro ao remover usuário {user_id} do grupo: {e}")
             except Exception:
                 pass
-
+      
 # -------------------------
 # Handler para novos membros no grupo de prévia (ANTI-RETORNO CORRIGIDO)
 # -------------------------
@@ -477,9 +492,9 @@ async def handle_chat_member_update(update: ChatMemberUpdated):
                         await bot.ban_chat_member(PREVIEWS_GROUP_ID, user_id)
                         await mark_user_banned(user_id)
                         name = user.first_name or "Usuário"
-                        ban_text = "{name}, seu acesso gratuito já expirou. Para voltar, só no VIP: {link}".format(
-                            name=name, link=PURCHASE_LINK
-                        )
+                        ban_text = "{name}, your free access has expired. To return, only VIP: {link}".format(
+    name=name, link=PURCHASE_LINK
+)
                         await safe_send_message(user_id, ban_text, name_for_cta=name)
                         logger.info(f"Usuário {user_id} ({name}) banido por tentativa de retorno após período")
                     except Exception as e:
@@ -493,14 +508,14 @@ async def handle_chat_member_update(update: ChatMemberUpdated):
             elif not user_info or not user_info[4]:  # joined_group flag
                 await update_user_joined(user_id, user.username, user.first_name, user.last_name)
 
-                # Vídeo CTA de boas-vindas
+                               # Vídeo CTA de boas-vindas
                 try:
-                    caption = CTA_TEXT.format(name=user.first_name or "Usuário")
+                    caption = CTA_TEXT.format(name=user.first_name or "Usuário", link=PURCHASE_LINK)
                     await bot.send_video(user_id, VIDEO_URL, caption=caption)
                     logger.info(f"Vídeo CTA de boas-vindas enviado para {user_id}")
                 except Exception as e:
                     logger.error(f"Erro ao enviar vídeo CTA de boas-vindas para {user_id}: {e}")
-
+                    
                 await schedule_user_messages(user_id, user.username, user.first_name, user.last_name)
 
                 # Mensagem imediata (dia 1)
