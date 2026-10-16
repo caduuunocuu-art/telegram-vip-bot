@@ -30,6 +30,7 @@ from apscheduler.triggers.date import DateTrigger
 # -------------------------
 API_TOKEN = os.getenv("TG_BOT_TOKEN", "PUT_YOUR_BOT_TOKEN_HERE")
 PREVIEWS_GROUP_ID = int(os.getenv("PREVIEWS_GROUP_ID", "-1003053104506"))
+print("🔥 PREVIEWS_GROUP_ID EM USO:", PREVIEWS_GROUP_ID)
 PREVIEWS_GROUP_INVITE_LINK = os.getenv("PREVIEWS_GROUP_INVITE_LINK", "https://t.me/+wYpQExxUOzkyNDk5")
 
 # Redirecionamento para o bot de vendas (clicável)
@@ -123,48 +124,43 @@ _db_lock = asyncio.Lock()
 # Mensagens estruturadas (funil 2 dias x 5 envios/dia + retarget)
 # -------------------------
 MESSAGES_SCHEDULE = {
-    "1": {
-        "12:00": "🚨 {name}, SEU ACESSO À PRÉVIA COMEÇOU!\n\n⚠️ ATENÇÃO: Você tem 48h para aproveitar o conteúdo GRÁTIS antes do banimento automático!\n\n🔥 Enquanto isso, no VIP: +15 cenas EXCLUSIVAS por dia\n💎 Veja o que te espera: {link}",
+  "1": {
+    "12:00": "🚨 {name}, SEU ACESSO À PRÉVIA COMEÇOU!\n\n⚠️ ATENÇÃO: Você tem 48h para aproveitar o conteúdo GRÁTIS antes do banimento automático!\n\n🔥 Enquanto isso, no VIP: +15 cenas EXCLUSIVAS por dia\n💎 Veja o que te espera: {link}",
         "18:00": "😈 {name}, AS CENAS MAIS PESADAS ESTÃO NO VIP!\n\nAqui você vê apenas amostras, lá tem:\n• Cenas COMPLETAS e sem censura\n• Conteúdo DIÁRIO nunca visto antes\n• OnlyFans vazado\n• Close Friends exclusivo\n\n⚡ Não se contente com migalhas: {link}",
         "22:00": "🌙 {name}, HOJE 23 PESSOAS MIGRARAM DA PRÉVIA PARA O VIP!\n\nCansaram de ver só o básico e foram para o conteúdo completo!\n\n🚀 Sua vez amanhã? {link}"
-    },
-    "2": {
-        "12:00": "⏰ {name}, FALTAM 12H PARA O SEU BANIMENTO!\n\nSeu acesso gratuito termina HOJE às 22h!\n\n🔞 No VIP você teria acesso agora a:\n✅ +500 cenas COMPLETAS\n✅ +50 OnlyFans vazados\n✅ Conteúdo DIÁRIO\n\n💀 Vai perder essa chance? {link}",
+  },
+  "2": {
+     "12:00": "⏰ {name}, FALTAM 12H PARA O SEU BANIMENTO!\n\nSeu acesso gratuito termina HOJE às 22h!\n\n🔞 No VIP você teria acesso agora a:\n✅ +500 cenas COMPLETAS\n✅ +50 OnlyFans vazados\n✅ Conteúdo DIÁRIO\n\n💀 Vai perder essa chance? {link}",
         "18:00": "🚨 {name}, ALERTA VERMELHO: 6H RESTANTES!\n\nSeu banimento da prévia está chegando!\n\n🔥 Última chance para entrar no VIP com:\n• Acesso vitalício\n• Conteúdo sem censura\n• Atualizações diárias\n\n⚡ Corre antes que acabe: {link}",
         "22:00": "💀 {name}, ÚLTIMA HORA NA PRÉVIA!\n\nFALTAM APENAS 60 MINUTOS para o seu banimento!\n\n🎯 Dos 47 banidos hoje, 41 entraram no VIP!\n\n🚀 Última chamada: {link}"
-    },
-
-    "retarget": {
-        "1": {
-            "12:00": "💔 {name}, VOCÊ FOI REMOVIDO DA PRÉVIA…\n\nMas sua jornada adulta não precisa acabar aqui!\n\n🔞 No VIP você teria acesso AGORA a:\n• Cenas completas que você perdeu\n• OnlyFans exclusivos\n• Conteúdo SEM CENSURA\n\n⚡ Volte agora: {link}",
+  },
+  "retarget": {
+    "1": {
+          "12:00": "💔 {name}, VOCÊ FOI REMOVIDO DA PRÉVIA…\n\nMas sua jornada adulta não precisa acabar aqui!\n\n🔞 No VIP você teria acesso AGORA a:\n• Cenas completas que você perdeu\n• OnlyFans exclusivos\n• Conteúdo SEM CENSURA\n\n⚡ Volte agora: {link}",
             "18:00": "😈 {name}, SENTIU FALTA DAS CENAS QUENTES?\n\nEnquanto você estava fora, soltaram +8 NOVAS cenas no VIP!\n\n🔥 Conteúdo que você NÃO encontra em nenhum outro lugar!\n💎 Acesso imediato: {link}",
             "22:00": "🌙 {name}, A NOITE ESTÁ PEGANDO FOGO NO VIP!\n\n23 ex-membros da prévia voltaram hoje e estão aproveitando o conteúdo premium!\n\n🚀 Sua vez? {link}"
-        },
-
-        "2": {
-            "12:00": "🚨 {name}, ALERTA: TEM CONTEÚDO NOVO!\n\nEnquanto você está fora, o VIP está bombando com:\n• OnlyFans vazado HOJE\n• Close Friends exclusivo\n• Cenas completas sem cortes\n\n⚡ Não fique de fora: {link}",
+    },
+    "2": {
+      "12:00": "🚨 {name}, ALERTA: TEM CONTEÚDO NOVO!\n\nEnquanto você está fora, o VIP está bombando com:\n• OnlyFans vazado HOJE\n• Close Friends exclusivo\n• Cenas completas sem cortes\n\n⚡ Não fique de fora: {link}",
             "18:00": "😈 {name}, HOJE O VIP ESTÁ EXPLODINDO!\n\nLançamos conteúdo EXPLÍCITO que vai te deixar maluco!\n\n🔥 Cenas inéditas!\n💎 Acesse agora: {link}",
             "22:00": "💀 {name}, ÚLTIMO CONVITE ESPECIAL DE HOJE!\n\nLiberamos vagas por TEMPO LIMITADO!\n\n🎯 Condições especiais para ex-membros da prévia!\n⚡ Entre agora: {link}"
-        },
-
-        "3": {
-            "12:00": "⚡ {name}, PERIGO NA ÁREA!\n\nO conteúdo MAIS PESADO está no VIP agora!\n\n🔞 Cenas proibidas\n🔞 OnlyFans exclusivos\n🔞 Close Friends íntimo\n\n🚀 Tem coragem? {link}",
+    },
+    "3": {
+      "12:00": "⚡ {name}, PERIGO NA ÁREA!\n\nO conteúdo MAIS PESADO está no VIP agora!\n\n🔞 Cenas proibidas\n🔞 OnlyFans exclusivos\n🔞 Close Friends íntimo\n\n🚀 Tem coragem? {link}",
             "18:00": "😈 {name}, HOJE TEM CENA EXPLÍCITA NO VIP!\n\nConteúdo tão quente que quase derreteu o servidor!\n\n🔥 Só para os fortes!\n💎 Entra se tiver coragem: {link}",
             "22:00": "🌙 {name}, PRAZER A NOITE TODA NO VIP!\n\nEnquanto você dorme, o grupo está fervendo com conteúdo pesado!\n\n🚀 Última chance de hoje: {link}"
-        },
-
-        "4": {
-            "12:00": "🎯 {name}, OFERTA RELÂMPAGO!\n\nSó HOJE: bônus exclusivo para quem voltar!\n\n🔞 Pacote de cenas inéditas\n🔞 OnlyFans nunca vazados antes\n🔞 Conteúdo extra quente\n\n⚡ Somente agora: {link}",
+    },
+    "4": {
+      "12:00": "🎯 {name}, OFERTA RELÂMPAGO!\n\nSó HOJE: bônus exclusivo para quem voltar!\n\n🔞 Pacote de cenas inéditas\n🔞 OnlyFans nunca vazados antes\n🔞 Conteúdo extra quente\n\n⚡ Somente agora: {link}",
             "18:00": "🚨 {name}, AS VAGAS ESTÃO ACABANDO!\n\nRestam apenas 8 vagas com bônus especial!\n\n🔥 Conteúdo viciante!\n💎 Garanta já: {link}",
             "22:00": "💀 {name}, ÚLTIMA CHAMADA COM BÔNUS!\n\nFaltam só 2 horas para o bônus acabar!\n\n⚡ Não deixe para depois: {link}"
-        },
-
-        "5": {
-            "12:00": "⌛ {name}, CONTAGEM REGRESSIVA FINAL!\n\nÚLTIMO DIA com condições especiais!\n\n🔞 O preço sobe 50% amanhã\n🔞 Os bônus expiram hoje\n\n🚀 Última chance real: {link}",
+    },
+    "5": {
+      "12:00": "⌛ {name}, CONTAGEM REGRESSIVA FINAL!\n\nÚLTIMO DIA com condições especiais!\n\n🔞 O preço sobe 50% amanhã\n🔞 Os bônus expiram hoje\n\n🚀 Última chance real: {link}",
             "18:00": "⏳ {name}, FALTAM 6H PARA MUDAR TUDO!\n\nO VIP nunca mais estará tão barato quanto hoje!\n\n🔥 Última chance no preço atual\n💎 Amanhã será tarde: {link}",
             "22:00": "💀 {name}, ÚLTIMO ADEUS!\n\nEsta é sua ÚLTIMA mensagem do sistema!\n\n⚡ As oportunidades acabam em 2h\n🎯 O preço muda AMANHÃ\n\n🔞 Última chamada: {link}"
-        }
     }
+  }
 }
 # -------------------------
 # Inicialização do banco de dados
@@ -211,8 +207,7 @@ async def cmd_start(message: types.Message):
 • Sistema anti-retorno ativo (não tente voltar sem pagar)
 • O VIP desbloqueia todos os benefícios
 
-👉 Dica: Entre AGORA e não perca nada!
-""".format(
+👉 Dica: Entre AGORA e não perca nada!""".format(
     invite_link=PREVIEWS_GROUP_INVITE_LINK,
     days=DAYS_OF_PREVIEW
 )
@@ -458,7 +453,7 @@ async def remove_user_from_group(user_id: int):
         user_info = await get_user_info(user_id)
         if user_info:
             name = user_info[2] or "Usuário"
-            removal_text = "{name}, seu acesso gratuito expirou. Para voltar, somente entrando no VIP: {link}".format(
+            removal_text = "{name}, your free access has expired. To return, only VIP: {link}".format(
                 name=name, link=PURCHASE_LINK
             )
             await safe_send_message(user_id, removal_text, name_for_cta=name)  # ← CORRIGIDO!
@@ -655,6 +650,18 @@ async def cmd_unban(message: types.Message):
         await message.answer(error_msg)
         logger.error(f"Erro no comando desbanir: {e}")
 
+   # -------------------------
+   # Captura de file_id (admin envia vídeo e o bot responde com o ID)
+   # -------------------------
+@dp.message_handler(
+       content_types=[types.ContentType.VIDEO, types.ContentType.DOCUMENT],
+       user_id=list(ADMINS),
+       chat_type=ChatType.PRIVATE,
+   )
+async def get_file_id(message: types.Message):
+       media = message.video or message.document
+       await message.answer(f"file_id:\n\n{media.file_id}")
+       
 # -------------------------
 # Startup / Shutdown
 # -------------------------
@@ -673,4 +680,5 @@ if __name__ == '__main__':
         on_startup=on_startup,
         on_shutdown=on_shutdown,
         skip_updates=True,
+        allowed_updates=["message", "chat_member", "my_chat_member"]
     )
