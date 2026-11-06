@@ -99,7 +99,7 @@ LANG_CODE = os.getenv("LANG_CODE", "pt")
 # -------------------------
 MESSAGES = {
     "pt": {
-        "button": "🔓 Liberar grupo VIP",
+        "button": "🔓 Liberar grupo VIP🔥",
         "start": (
             "⚠️ Aviso! O link abaixo é do grupo PRÉVIAS do VIP. "
             "Você terá apenas 1 minuto e meio de acesso.\n\n"
@@ -119,7 +119,7 @@ MESSAGES = {
             "🎬 Vários vídeos em diferentes tópicos\n"
             "🕵️ 100% anônimo\n"
             "🔒 Seguro: tudo dentro do próprio Telegram\n"
-            "⚡ Pagou, entrou. O acesso é liberado automático\n\n"
+            "⚡ O acesso é liberado automático\n\n"
             "👇 Toque no botão e libere agora"
         ),
         "m10": (
