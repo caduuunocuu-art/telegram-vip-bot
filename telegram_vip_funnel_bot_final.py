@@ -17,12 +17,15 @@
 
 import os
 import time
+import hmac
+import hashlib
 import asyncio
 import logging
 from datetime import datetime, timedelta, time as dtime
 
 import pytz
 import aiosqlite
+from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import (
     ChatType,
@@ -38,6 +41,7 @@ from aiogram.utils.exceptions import (
     UserDeactivated,
     Unauthorized,
     TelegramAPIError,
+    NetworkError,
 )
 
 # -------------------------
@@ -92,6 +96,13 @@ ADMINS = {int(x) for x in os.getenv("ADMINS", "").replace(" ", "").split(",") if
 ADMIN_FILTER = list(ADMINS) or [0]
 
 LANG_CODE = os.getenv("LANG_CODE", "pt")
+
+# Rastreio de cliques no botão (opcional).
+# Se PUBLIC_URL estiver vazio, o botão vai direto para o bot de vendas (sem contar cliques).
+# Se preencher (ex.: https://seu-bot.up.railway.app), o botão passa por um link do
+# próprio bot, que conta o clique e redireciona para o bot de vendas.
+PUBLIC_URL = os.getenv("PUBLIC_URL", "").strip().rstrip("/")
+PORT = int(os.getenv("PORT", "8080"))
 
 # -------------------------
 # Textos (português). A versão em inglês entra depois como MESSAGES["en"].
@@ -217,6 +228,13 @@ CREATE TABLE IF NOT EXISTS queue (
     processed_at INTEGER
 );
 
+CREATE TABLE IF NOT EXISTS clicks (
+    user_id INTEGER,
+    kind TEXT,
+    clicked_at INTEGER,
+    PRIMARY KEY (user_id, kind)
+);
+
 CREATE INDEX IF NOT EXISTS idx_queue_due ON queue(status, run_at);
 CREATE INDEX IF NOT EXISTS idx_queue_user ON queue(user_id);
 """
@@ -280,9 +298,21 @@ def purchase_url(kind: str) -> str:
     return f"{PURCHASE_LINK}{sep}start=prev_{kind}"
 
 
-def sales_keyboard(kind: str) -> InlineKeyboardMarkup:
+def click_sig(user_id: int, kind: str) -> str:
+    """Assinatura curta no link de rastreio, para ninguém inventar cliques."""
+    raw = hmac.new(API_TOKEN.encode(), f"{user_id}:{kind}".encode(), hashlib.sha256).hexdigest()
+    return raw[:12]
+
+
+def button_url(kind: str, user_id: int) -> str:
+    if PUBLIC_URL:
+        return f"{PUBLIC_URL}/go/{kind}/{user_id}/{click_sig(user_id, kind)}"
+    return purchase_url(kind)
+
+
+def sales_keyboard(kind: str, user_id: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup()
-    kb.add(InlineKeyboardButton(MSG["button"], url=purchase_url(kind)))
+    kb.add(InlineKeyboardButton(MSG["button"], url=button_url(kind, user_id)))
     return kb
 
 
@@ -354,7 +384,7 @@ _BLOCKED_ERRORS = (BotBlocked, ChatNotFound, UserDeactivated, Unauthorized)
 
 async def send_with_button(chat_id: int, text: str, kind: str, with_video: bool = True) -> str:
     """Retorna 'ok', 'blocked' ou 'failed'."""
-    kb = sales_keyboard(kind)
+    kb = sales_keyboard(kind, chat_id)
     for attempt in range(MAX_RETRIES):
         try:
             if with_video and VIDEO_URL and len(text) <= 1024:
@@ -380,12 +410,27 @@ async def send_with_button(chat_id: int, text: str, kind: str, with_video: bool 
     return "failed"
 
 
+async def tg_retry(func, *args, tries: int = 3, **kwargs):
+    """Repete a chamada se a rede falhar (erro passageiro entre o servidor e o Telegram)."""
+    for attempt in range(1, tries + 1):
+        try:
+            return await func(*args, **kwargs)
+        except RetryAfter as e:
+            await asyncio.sleep(getattr(e, "timeout", None) or 3)
+        except (NetworkError, asyncio.TimeoutError, OSError) as e:
+            if attempt == tries:
+                raise
+            logger.warning(f"Falha de rede ({e}); tentativa {attempt}/{tries}, tentando de novo")
+            await asyncio.sleep(1.5 * attempt)
+    return await func(*args, **kwargs)
+
+
 async def kick_from_group(user_id: int, permanent: bool = False):
     """Remove do grupo. Se não for permanente, desbane na sequência (pode voltar, mas só com link novo)."""
-    await bot.ban_chat_member(PREVIEWS_GROUP_ID, user_id)
+    await tg_retry(bot.ban_chat_member, PREVIEWS_GROUP_ID, user_id)
     if not permanent:
         await asyncio.sleep(1)
-        await bot.unban_chat_member(PREVIEWS_GROUP_ID, user_id, only_if_banned=True)
+        await tg_retry(bot.unban_chat_member, PREVIEWS_GROUP_ID, user_id, only_if_banned=True)
 
 
 # -------------------------
@@ -482,19 +527,24 @@ async def get_or_create_invite(user_id: int, row) -> str:
         return row["invite_link"]
 
     try:
-        inv = await bot.create_chat_invite_link(
+        inv = await tg_retry(
+            bot.create_chat_invite_link,
             PREVIEWS_GROUP_ID,
             name=f"u{user_id}",
             expire_date=now + ttl,
             member_limit=1,
+            tries=4,
         )
         link = inv.invite_link
     except Exception as e:
         logger.error(f"Não consegui criar o link individual: {e}")
+        if isinstance(e, NetworkError):
+            hint = "Foi falha de rede com o Telegram, mesmo depois de 4 tentativas."
+        else:
+            hint = "Confira se o bot é admin do grupo com permissão de convidar usuários."
         await notify_admins(
             f"⚠️ Não consegui criar o link de convite individual: {e}\n"
-            "Usei o link fixo (PREVIEWS_GROUP_INVITE_LINK). Confira se o bot é admin do grupo "
-            "com permissão de convidar usuários."
+            f"Usei o link fixo (PREVIEWS_GROUP_INVITE_LINK). {hint}"
         )
         link = PREVIEWS_GROUP_INVITE_LINK
         if not link:
@@ -582,6 +632,50 @@ async def on_member_update(update: ChatMemberUpdated):
 
 
 # -------------------------
+# Rastreio de cliques (link do botão -> conta -> redireciona para o bot de vendas)
+# -------------------------
+_web_runner = None
+CLICK_KINDS = SALES_KINDS + ["used"]
+
+
+async def handle_click(request):
+    """GET /go/<etapa>/<user_id>/<assinatura>: registra 1 clique por pessoa/etapa e redireciona."""
+    kind = request.match_info.get("kind", "")
+    target = purchase_url(kind) if kind in CLICK_KINDS else PURCHASE_LINK
+    try:
+        uid = int(request.match_info.get("uid", "0"))
+        sig = request.match_info.get("sig", "")
+        valid = kind in CLICK_KINDS and hmac.compare_digest(sig, click_sig(uid, kind))
+        if valid and request.method == "GET":
+            await db_exec(
+                "INSERT OR IGNORE INTO clicks (user_id, kind, clicked_at) VALUES (?, ?, ?)",
+                (uid, kind, int(time.time())),
+            )
+    except Exception as e:
+        logger.warning(f"Erro ao registrar clique: {e}")
+    raise web.HTTPFound(target)
+
+
+async def handle_health(request):
+    return web.Response(text="ok")
+
+
+async def start_web():
+    """Sobe o servidor de rastreio, só se PUBLIC_URL estiver configurada."""
+    global _web_runner
+    if not PUBLIC_URL:
+        logger.info("Rastreio de cliques DESLIGADO (PUBLIC_URL vazia): botão vai direto ao bot de vendas")
+        return
+    app = web.Application()
+    app.router.add_get("/", handle_health)
+    app.router.add_get("/go/{kind}/{uid}/{sig}", handle_click)
+    _web_runner = web.AppRunner(app)
+    await _web_runner.setup()
+    await web.TCPSite(_web_runner, "0.0.0.0", PORT).start()
+    logger.info(f"Rastreio de cliques LIGADO na porta {PORT} ({PUBLIC_URL})")
+
+
+# -------------------------
 # Comandos de administrador
 # -------------------------
 @dp.message_handler(commands=["stats"], user_id=ADMIN_FILTER, chat_type=ChatType.PRIVATE)
@@ -592,8 +686,14 @@ async def cmd_stats(message: types.Message):
         removed = (await db_one("SELECT COUNT(*) AS n FROM users WHERE removed_at IS NOT NULL"))["n"]
         blocked = (await db_one("SELECT COUNT(*) AS n FROM users WHERE blocked=1"))["n"]
         pending = (await db_one("SELECT COUNT(*) AS n FROM queue WHERE status='pending'"))["n"]
-        rows = await db_all("SELECT kind, COUNT(*) AS n FROM queue WHERE status='done' GROUP BY kind")
-        sent = {r["kind"]: r["n"] for r in rows}
+        clicked_users = (await db_one("SELECT COUNT(DISTINCT user_id) AS n FROM clicks"))["n"]
+
+        sent = {r["kind"]: r["n"] for r in await db_all(
+            "SELECT kind, COUNT(*) AS n FROM queue WHERE status='done' GROUP BY kind")}
+        blocked_by = {r["kind"]: r["n"] for r in await db_all(
+            "SELECT kind, COUNT(*) AS n FROM queue WHERE status='blocked' GROUP BY kind")}
+        clicks = {r["kind"]: r["n"] for r in await db_all(
+            "SELECT kind, COUNT(*) AS n FROM clicks GROUP BY kind")}
 
         lines = [
             "📊 Estatísticas do funil de prévias\n",
@@ -601,15 +701,123 @@ async def cmd_stats(message: types.Message):
             f"• Entraram na prévia: {joined}",
             f"• Já removidos: {removed}",
             f"• Bloquearam o bot: {blocked}",
-            f"• Mensagens na fila: {pending}\n",
-            "Mensagens enviadas por etapa:",
+            f"• Mensagens na fila: {pending}",
         ]
+        if PUBLIC_URL:
+            lines.append(f"• Pessoas que clicaram no botão: {clicked_users}")
+        lines += ["", "Mensagens por etapa (enviadas | cliques no botão | bloquearam o bot):"]
+
         for k in SALES_KINDS:
-            lines.append(f"  {k}: {sent.get(k, 0)}")
+            s_n = sent.get(k, 0)
+            if PUBLIC_URL:
+                c_n = clicks.get(k, 0)
+                rate = f"{c_n * 100 / s_n:.0f}%" if s_n else "0%"
+                click_txt = f"{c_n} cliques ({rate})"
+            else:
+                click_txt = "cliques: rastreio desligado"
+            lines.append(f"  {k}: {s_n} enviadas | {click_txt} | {blocked_by.get(k, 0)} bloquearam")
+
         await message.answer("\n".join(lines))
     except Exception as e:
         logger.exception(f"Erro no /stats: {e}")
         await message.answer("❌ Erro ao recuperar estatísticas.")
+
+
+def day_bounds(d):
+    """Início (00:00) e fim (00:00 do dia seguinte) de um dia, no fuso TIMEZONE, em timestamp."""
+    start = int(TZ.localize(datetime.combine(d, dtime(0, 0))).timestamp())
+    end = int(TZ.localize(datetime.combine(d + timedelta(days=1), dtime(0, 0))).timestamp())
+    return start, end
+
+
+def parse_day_arg(arg: str):
+    """'' ou 'hoje' -> hoje | 'ontem' | '05/11' | '05/11/2026'. Retorna None se não entender."""
+    arg = (arg or "").strip().lower()
+    today = datetime.now(TZ).date()
+    if arg in ("", "hoje"):
+        return today
+    if arg == "ontem":
+        return today - timedelta(days=1)
+    parts = arg.replace("-", "/").split("/")
+    try:
+        day, month = int(parts[0]), int(parts[1])
+        year = int(parts[2]) if len(parts) > 2 else today.year
+        if year < 100:
+            year += 2000
+        d = datetime(year, month, day).date()
+        if len(parts) <= 2 and d > today:
+            d = datetime(year - 1, month, day).date()
+        return d
+    except Exception:
+        return None
+
+
+@dp.message_handler(commands=["statsdia"], user_id=ADMIN_FILTER, chat_type=ChatType.PRIVATE)
+async def cmd_statsdia(message: types.Message):
+    """Estatísticas só do dia (meia-noite a meia-noite). /statsdia, /statsdia ontem, /statsdia 05/11"""
+    try:
+        day = parse_day_arg(message.get_args())
+        if day is None:
+            await message.answer("Use: /statsdia (hoje), /statsdia ontem ou /statsdia 05/11")
+            return
+        s, e = day_bounds(day)
+        rng = (s, e)
+        today = datetime.now(TZ).date()
+        tag = " (hoje)" if day == today else " (ontem)" if day == today - timedelta(days=1) else ""
+
+        async def n(query):
+            return (await db_one(query, rng))["n"]
+
+        new_starts = await n("SELECT COUNT(*) AS n FROM users WHERE started_at>=? AND started_at<?")
+        joined = await n("SELECT COUNT(*) AS n FROM users WHERE joined_at>=? AND joined_at<?")
+        removed = await n("SELECT COUNT(*) AS n FROM users WHERE removed_at>=? AND removed_at<?")
+        blocked_people = await n(
+            "SELECT COUNT(DISTINCT user_id) AS n FROM queue WHERE status='blocked' "
+            "AND processed_at>=? AND processed_at<?")
+        clicked_people = await n(
+            "SELECT COUNT(DISTINCT user_id) AS n FROM clicks WHERE clicked_at>=? AND clicked_at<?")
+
+        async def by_kind(query):
+            return {r["kind"]: r["n"] for r in await db_all(query, rng)}
+
+        sent = await by_kind(
+            "SELECT kind, COUNT(*) AS n FROM queue WHERE status='done' "
+            "AND processed_at>=? AND processed_at<? GROUP BY kind")
+        blocked_by = await by_kind(
+            "SELECT kind, COUNT(*) AS n FROM queue WHERE status='blocked' "
+            "AND processed_at>=? AND processed_at<? GROUP BY kind")
+        clicks = await by_kind(
+            "SELECT kind, COUNT(*) AS n FROM clicks WHERE clicked_at>=? AND clicked_at<? GROUP BY kind")
+
+        lines = [
+            f"📅 Estatísticas do dia {day.strftime('%d/%m/%Y')}{tag}\n",
+            f"• Novos /start: {new_starts}",
+            f"• Entraram na prévia: {joined}",
+            f"• Removidos: {removed}",
+            f"• Bloquearam o bot: {blocked_people}",
+            f"• Mensagens enviadas no dia: {sum(sent.values())}",
+        ]
+        if PUBLIC_URL:
+            lines.append(f"• Pessoas que clicaram no botão: {clicked_people}")
+        if day == today:
+            pending = (await db_one("SELECT COUNT(*) AS n FROM queue WHERE status='pending'"))["n"]
+            lines.append(f"• Mensagens na fila agora: {pending}")
+        lines += ["", "Mensagens por etapa (enviadas | cliques no botão | bloquearam o bot):"]
+
+        for k in SALES_KINDS:
+            s_n = sent.get(k, 0)
+            if PUBLIC_URL:
+                c_n = clicks.get(k, 0)
+                rate = f"{c_n * 100 / s_n:.0f}%" if s_n else "0%"
+                click_txt = f"{c_n} cliques ({rate})"
+            else:
+                click_txt = "cliques: rastreio desligado"
+            lines.append(f"  {k}: {s_n} enviadas | {click_txt} | {blocked_by.get(k, 0)} bloquearam")
+
+        await message.answer("\n".join(lines))
+    except Exception as ex:
+        logger.exception(f"Erro no /statsdia: {ex}")
+        await message.answer("❌ Erro ao recuperar as estatísticas do dia.")
 
 
 @dp.message_handler(commands=["reset"], user_id=ADMIN_FILTER, chat_type=ChatType.PRIVATE)
@@ -649,6 +857,7 @@ async def on_startup(_):
     global _worker_task
     await init_db()
     _worker_task = asyncio.create_task(worker_loop())
+    await start_web()
     logger.info(
         f"Bot iniciado | grupo={PREVIEWS_GROUP_ID} | prévia={PREVIEW_SECONDS}s | "
         f"TEST_MODE={'on' if TEST_MODE else 'off'} | vídeo={'ok' if VIDEO_URL else 'NÃO CONFIGURADO'}"
@@ -658,6 +867,8 @@ async def on_startup(_):
 async def on_shutdown(_):
     if _worker_task:
         _worker_task.cancel()
+    if _web_runner:
+        await _web_runner.cleanup()
     logger.info("Bot desligado")
 
 
